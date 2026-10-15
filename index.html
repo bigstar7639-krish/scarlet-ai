@@ -6,6 +6,7 @@
 <title>Scarlet AI</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#fff;font-family:system-ui}
@@ -19,6 +20,7 @@ header{display:flex;justify-content:space-between;align-items:center;padding:14p
 textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;outline:none;resize:none;font-size:15px}
 .gen-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:14px;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;font-size:16px}
 #result img{width:100%;border-radius:12px;margin-top:14px}
+#g_id_onload{position:fixed;top:70px;right:10px;z-index:100}
 </style>
 </head>
 <body>
@@ -30,6 +32,7 @@ textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;
 <span id="userInfo" style="display:none"></span>
 </div>
 </header>
+<div id="g_id_onload"></div>
 <div class="main">
 <div class="card">
 <h3>✨ Create Image</h3>
@@ -39,7 +42,6 @@ textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;
 </div>
 </div>
 <script>
-// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",
   authDomain: "scarlet-ai-fa68c.firebaseapp.com",
@@ -51,40 +53,66 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// IMPORTANT: Set persistence ONCE on load, NOT inside click
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
 const loginBtn = document.getElementById('loginBtn');
 const userInfo = document.getElementById('userInfo');
+const GOOGLE_CLIENT_ID = "145131745721-gu1u800lif4elinkbb09s06aktel90fr.apps.googleusercontent.com";
 
-// REDIRECT RESULT
-auth.getRedirectResult().then((result)=>{
-  if(result && result.user){
-    console.log("Login OK", result.user.email);
+function handleCredentialResponse(response){
+  const idToken = response.credential;
+  const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+  loginBtn.innerText = "Logging in...";
+  auth.signInWithCredential(credential).then((result)=>{
+    console.log("SUCCESS HARI!", result.user.email);
+  }).catch((e)=>{
+    alert("Login failed: "+e.message);
+    loginBtn.innerText = "Login";
+    console.error(e);
+  });
+}
+
+function initGSI(){
+  if(!window.google || !window.google.accounts) {
+    setTimeout(initGSI, 300);
+    return;
   }
-}).catch(e=>{ console.log("Redirect error", e); });
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+    auto_select: false,
+    cancel_on_tap_outside: false
+  });
+  // Pre-load One Tap
+  google.accounts.id.prompt();
+}
 
-// AUTH STATE
+window.addEventListener('load', initGSI);
+
+loginBtn.onclick = ()=>{
+  if(!window.google || !window.google.accounts){
+    alert("Google loading da... 2 sec aprom click pannu");
+    return;
+  }
+  google.accounts.id.prompt((notification)=>{
+    console.log("Prompt status", notification);
+    if(notification.isNotDisplayed()){
+      alert("Popup blocked da! Chrome la 'Allow popups' pannu, aprom refresh panni try pannu da!");
+    }
+  });
+};
+
 auth.onAuthStateChanged((user)=>{
   if(user){
     loginBtn.style.display='none';
     userInfo.style.display='flex';
     userInfo.style.alignItems='center';
-    userInfo.innerHTML = `<span>👤 ${user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0]}</span><button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:5px 12px;border-radius:12px;background:#222;color:#fff;border:1px solid #444">Logout</button>`;
+    userInfo.innerHTML = `<span>👤 ${user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : 'User')}</span><button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:5px 12px;border-radius:12px;background:#222;color:#fff;border:1px solid #444;cursor:pointer">Logout</button>`;
   }else{
     loginBtn.style.display='block';
     userInfo.style.display='none';
+    loginBtn.innerText="Login";
   }
 });
 
-// LOGIN - NO ASYNC, DIRECT REDIRECT (FIXES ABOUT:BLANK)
-loginBtn.onclick = ()=>{
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({prompt: 'select_account'});
-  auth.signInWithRedirect(provider);
-};
-
-// GENERATE
 function getCredits(){
   const k='img_use_'+new Date().toDateString();
   let u=parseInt(localStorage.getItem(k)||"0"); if(isNaN(u)) u=0;
@@ -95,13 +123,13 @@ getCredits();
 document.getElementById('genBtn').onclick=()=>{
   const p=document.getElementById('prompt').value.trim();
   if(!p) return alert("Prompt type pannu da!");
-  let {u,k}=getCredits(); if(u>=6) return alert("Daily over da!");
+  let {u,k}=getCredits(); if(u>=6) return alert("Daily 6 over da! Tomorrow va!");
   const b=document.getElementById('genBtn'); b.disabled=true; b.innerText="Generating... 🔥";
   const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
   const r=document.getElementById('result');
   const img=new Image(); img.src=url;
   img.onload=()=>{ r.innerHTML=''; r.appendChild(img); b.disabled=false; b.innerText='Generate (1 Credit)'; localStorage.setItem(k,String(u+1)); getCredits(); };
-  img.onerror=()=>{ b.disabled=false; b.innerText='Generate (1 Credit)'; alert("Failed, try again"); };
+  img.onerror=()=>{ b.disabled=false; b.innerText='Generate (1 Credit)'; alert("Failed, try again da"); };
 };
 </script>
 </body>
