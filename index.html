@@ -33,12 +33,11 @@ textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;
 <div class="main">
 <div class="card">
 <h3>✨ Create Image</h3>
-<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city, ultra detailed..."></textarea>
+<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city..."></textarea>
 <button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
 <div id="result"></div>
 </div>
 </div>
-
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE",
@@ -48,39 +47,46 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// 1. Handle Redirect Result FIRST
+// GET REDIRECT RESULT FIRST
 auth.getRedirectResult().then((result)=>{
   if(result && result.user){
-    console.log("Login Success:", result.user.displayName);
+    alert("SUCCESS DA HARI! Welcome "+result.user.displayName+" 🔥");
   }
 }).catch((e)=>{
-  alert("Redirect Error: " + e.code + "\n" + e.message);
-  document.getElementById('loginBtn').innerText = "Login";
+  alert("Redirect Result Error: "+e.code+"\n"+e.message);
 });
 
-// 2. Login - ONLY REDIRECT (No Popup = No about:blank)
-document.getElementById('loginBtn').onclick = ()=>{
+// LOGIN WITH DEBUG ALERTS
+document.getElementById('loginBtn').onclick = async ()=>{
   const btn = document.getElementById('loginBtn');
-  btn.innerText = "Opening Google...";
-  const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({prompt: 'select_account'});
-  auth.signInWithRedirect(provider);
+  try{
+    alert("Step 1: Firebase Ready...");
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt: 'select_account'});
+    
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    alert("Step 2: Persistence OK - Redirecting NOW!");
+    
+    btn.innerText = "Opening Google...";
+    await auth.signInWithRedirect(provider);
+    
+  }catch(e){
+    alert("FIREBASE ERROR:\nCode: "+e.code+"\nMessage: "+e.message+"\n\nScreenshot eduthu anuppu da!");
+    btn.innerText = "Login";
+  }
 };
 
-// 3. Auth State
+// Auth state
 auth.onAuthStateChanged((user)=>{
   if(user){
     document.getElementById('loginBtn').style.display='none';
     const u = document.getElementById('userInfo');
     u.style.display='block';
     u.innerHTML = `👤 ${user.displayName.split(' ')[0]} <button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:5px 12px;border-radius:12px;background:#222;color:#fff;border:1px solid #444">Logout</button>`;
-  } else {
-    document.getElementById('loginBtn').style.display='block';
-    document.getElementById('userInfo').style.display='none';
   }
 });
 
-// Credits + Generate
+// Generate
 function getCredits(){
   const k='img_use_'+new Date().toDateString();
   let u=parseInt(localStorage.getItem(k)||"0"); if(isNaN(u)) u=0;
