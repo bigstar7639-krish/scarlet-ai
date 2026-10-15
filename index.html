@@ -9,15 +9,15 @@
 body{background:#000;color:#fff;font-family:system-ui,sans-serif;display:flex;height:100vh;overflow:hidden}
 .side{width:285px;background:#0f0f0f;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column}
 .logo{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #222}
-.logo img{width:48px;height:48px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 12px #ff0040;object-fit:cover}
+.logo img{width:52px;height:52px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 18px #ff0040;object-fit:cover;object-position:top}
 .logo b{color:#ff0040}
 .main{flex:1;display:flex;flex-direction:column;background:#080808}
-.top{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;background:#0a0a0a}
+.top{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;background:#0a0a0a;gap:10px}
 .chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
 .msg{padding:12px 16px;border-radius:14px;max-width:88%;line-height:1.6;font-size:14px;word-break:break-word}
 .user{background:#ff0040;margin-left:auto}
 .ai{background:#1a1a1a;display:flex;gap:10px;align-items:flex-start}
-.ai img{width:28px;height:28px;border-radius:50%;border:1px solid #333;flex-shrink:0}
+.ai img{width:32px;height:32px;border-radius:50%;border:1px solid #ff0040;flex-shrink:0;object-fit:cover;object-position:top}
 .box{padding:14px 16px;border-top:1px solid #222;display:flex;gap:10px;background:#0a0a0a;flex-wrap:wrap}
 .box input{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px 16px;border-radius:12px;outline:none}
 .box input:focus{border-color:#ff0040}
@@ -34,7 +34,7 @@ body{background:#000;color:#fff;font-family:system-ui,sans-serif;display:flex;he
 <body>
 <div class="side">
 <div class="logo">
-<img src="IMG-20260105-WA4421.jpg">
+<img src="scarlet-logo.png">
 <div>SCARLET AI<br><small style="color:#777;font-size:11px">Free Chat • Paid Image</small></div>
 </div>
 <div style="display:flex;gap:6px;margin-bottom:12px">
@@ -85,42 +85,40 @@ window.loginWithGoogle = async () => {
     alert("Welcome " + result.user.displayName + " da! 🔥");
   }catch(e){ alert(e.message); }
 };
-
 window.logout = async () => { await signOut(auth); location.reload(); };
-
 onAuthStateChanged(auth, (user) => {
   if(user){
     document.getElementById('loginBtn').style.display='none';
     const info = document.getElementById('userInfo');
     info.style.display='block';
     info.innerHTML = `👤 ${user.displayName} <button onclick="logout()" style="margin-left:8px;padding:4px 10px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;cursor:pointer;">Logout</button>`;
-    console.log("Logged in:", user.email);
   }
 });
-
-window.FIREBASE_AUTH = auth;
 </script>
 
 <script>
 const FREE_IMG=6, PER_AD=2, MAX_ADS=5;
 function getU(){
   const d=new Date().toDateString();
-  return {used:parseInt(localStorage.getItem('img_use_'+d)||"0"), adC:parseInt(localStorage.getItem('img_adC_'+d)||"0"), total: FREE_IMG + (parseInt(localStorage.getItem('img_adC_'+d)||"0")*PER_AD)};
+  const used=parseInt(localStorage.getItem('img_use_'+d)||"0");
+  const adC=parseInt(localStorage.getItem('img_adC_'+d)||"0");
+  const total=FREE_IMG+(adC*PER_AD);
+  return {used,adC,total};
 }
 function update(){
   const u=getU();
   const pct=u.total>0?Math.min(100,(u.used/u.total)*100):0;
-  document.getElementById('lim').innerHTML=`<div style="display:flex;justify-content:space-between"><b>🖼️ ${u.used}/${u.total} Credits</b><small>${u.adC}/${MAX_ADS} Ads</small></div><div class="progress"><div style="width:${pct}%"></div></div><small style="color:#666">Chat is FREE Unlimited</small>`;
+  document.getElementById('lim').innerHTML=`<div style="display:flex;justify-content:space-between"><b>🖼️ ${u.used}/${u.total} Credits</b><small>${u.adC}/${MAX_ADS} Ads</small></div><div class="progress"><div style="width:${pct}%"></div></div><small style="color:#666">Chat is FREE Unlimited • ${u.total-u.used} left</small>`;
 }
 function canImage(){
   const u=getU();
-  if(u.used >= u.total){ alert(`No credits! Watch Ad to get +${PER_AD}`); return false; }
+  if(u.used>=u.total){ alert(`No credits! Watch Ad to get +${PER_AD}`); return false; }
   return true;
 }
 function watchAd(){
   const u=getU();
-  if(u.adC >= MAX_ADS){ alert("Max ads for today!"); return; }
-  alert("Ad watched! +2 Credits added 🔥 (Simulated)");
+  if(u.adC>=MAX_ADS){ alert("Max ads for today!"); return; }
+  alert("Ad watched! +2 Credits added 🔥");
   const d=new Date().toDateString();
   localStorage.setItem('img_adC_'+d, (u.adC+1).toString());
   update();
@@ -136,7 +134,11 @@ function send(){
     if(canImage()) generateImage(txt.replace(/generate image of/i,'').trim());
     return;
   }
-  setTimeout(()=>{ chat.innerHTML+=`<div class="msg ai"><img src="IMG-20260105-WA4421.jpg"><div>Hi da! I'm Scarlet AI by Hari 🔥 Chat FREE! For image, type description and click Generate. You have ${getU().total - getU().used} credits left.</div></div>`; chat.scrollTop=chat.scrollHeight; },500);
+  setTimeout(()=>{ 
+    const u=getU();
+    chat.innerHTML+=`<div class="msg ai"><img src="scarlet-logo.png"><div>Hi da! I'm Scarlet AI by Hari 🔥 Chat FREE! For image, type description and click Generate. You have ${u.total-u.used} credits left.</div></div>`; 
+    chat.scrollTop=chat.scrollHeight; 
+  },500);
   chat.scrollTop=chat.scrollHeight;
 }
 function generateImage(promptCustom){
@@ -149,12 +151,14 @@ function generateImage(promptCustom){
   localStorage.setItem('img_use_'+d, (u.used+1).toString());
   update();
   const chat=document.getElementById('chat');
-  chat.innerHTML+=`<div class="msg ai"><img src="IMG-20260105-WA4421.jpg"><div>🎨 Generating: <b>${prompt}</b><br><br><img src="https://picsum.photos/seed/${encodeURIComponent(prompt)}/400/300" style="width:100%;border-radius:12px;margin-top:8px;border:1px solid #333" onload="this.scrollIntoView()"><br><small style="color:#888">Image generated! Credits left: ${getU().total - getU().used -1}</small></div></div>`;
+  const left=getU().total-getU().used;
+  chat.innerHTML+=`<div class="msg ai"><img src="scarlet-logo.png"><div>🎨 Generating: <b>${prompt}</b><br><br><img src="https://picsum.photos/seed/${encodeURIComponent(prompt+Date.now())}/400/300" style="width:100%;border-radius:12px;margin-top:8px;border:1px solid #333"><br><small style="color:#888">Image generated! Credits left: ${left}</small></div></div>`;
   if(inp) inp.value='';
   chat.scrollTop=chat.scrollHeight;
 }
 document.getElementById('inp').addEventListener('keypress', (e)=>{ if(e.key==='Enter') send(); });
 update();
+document.getElementById('chat').innerHTML=`<div class="msg ai"><img src="scarlet-logo.png"><div>🔥 Welcome to Scarlet AI da Hari!<br><br>💬 Chat is FREE Unlimited<br>🖼️ Images: 6 FREE credits / day<br>Click Login to save your chat! 🚀</div></div>`;
 </script>
 </body>
 </html>
