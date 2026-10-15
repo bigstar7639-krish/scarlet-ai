@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scarlet AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:system-ui;display:flex;height:100vh}
+.side{width:280px;background:#0f0f0f;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.logo img{width:50px;height:50px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 15px #ff0040}
+.chat{flex:1;overflow:auto;padding:20px}
+.msg{margin:10px 0;padding:12px;border-radius:12px;max-width:85%}
+.user{background:#ff0040;margin-left:auto}
+.ai{background:#1a1a1a;display:flex;gap:10px}
+.ai img{width:30px;height:30px;border-radius:50%}
+</style>
+</head>
+<body>
+<div class="side">
+<div class="logo">
+<img src="LOGO_URL" id="logoImg">
+<div><b style="color:#ff0040">SCARLET AI</b><br><small style="color:#666">Free • 16/day</small></div>
+</div>
+<div id="lim" style="background:#1a1a1a;padding:10px;border-radius:8px;font-size:13px"></div>
+<button onclick="watchAd()" style="margin-top:10px;background:#00ff88;color:#000;border:none;padding:10px;width:100%;border-radius:8px;font-weight:bold">📺 Watch Ad +2</button>
+</div>
+<div class="main" style="flex:1;display:flex;flex-direction:column">
+<div class="chat" id="chat"></div>
+<div style="padding:15px;border-top:1px solid #222;display:flex;gap:10px">
+<input id="inp" style="flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:12px;border-radius:10px" placeholder="Message Scarlet AI...">
+<button onclick="send()" style="background:#ff0040;color:#fff;border:none;padding:12px 18px;border-radius:10px;font-weight:bold">Send</button>
+</div>
+</div>
+<script>
+// SAME ADS LOGIC AS BEFORE - COPY PASTE
+</script>
+</body>
+</html>
