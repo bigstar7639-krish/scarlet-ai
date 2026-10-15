@@ -19,21 +19,20 @@ button{cursor:pointer}
 .sb-item:hover{background:#2f2f2f}
 .sb-item.active{background:#212121}
 .sb-sec{margin-top:18px;padding:0 10px;font-size:11px;color:#8a8a8a;letter-spacing:.3px}
-.sb-recent{padding:7px 10px;border-radius:8px;font-size:13px;color:#b4b4b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-recent{padding:7px 10px;border-radius:8px;font-size:13px;color:#b4b4b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .sb-recent:hover{background:#212121;color:#fff}
 .main{flex:1;display:flex;flex-direction:column;min-width:0;background:#000;position:relative}
-.topbar{height:56px;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #1a1a1a;gap:8px}
+.topbar{height:56px;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #1a1a1a;gap:8px;overflow:visible}
 .top-left{display:flex;align-items:center;gap:10px}
 .chat-work{background:#1e1e1e;border-radius:20px;padding:3px;display:flex;gap:2px}
 .chat-work span{padding:5px 12px;border-radius:16px;font-size:13px;cursor:pointer}
 .chat-work.active{background:#2f2f2f;color:#fff}
 .top-center{position:absolute;left:50%;transform:translateX(-50%);font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .top-center img{width:20px;height:20px;border-radius:50%;border:1px solid #ff0040;object-fit:cover}
-.top-right{display:flex;align-items:center;gap:8px}
+.top-right{display:flex;align-items:center;gap:8px;position:relative}
 .credit{font-size:11px;border:1px solid #333;padding:4px 8px;border-radius:20px;color:#aaa}
 .login{background:#fff;color:#000;padding:7px 16px;border-radius:20px;border:0;font-weight:600;font-size:13px}
-.logout{background:#222;color:#fff;padding:7px 16px;border-radius:20px;border:1px solid #333;font-weight:600;font-size:13px}
-.avatar-sm{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid #ff0040}
+.avatar-sm{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #ff0040;cursor:pointer}
 .center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
 .ready{font-size:clamp(22px,5vw,30px);font-weight:400;letter-spacing:-.5px}
 .chat{flex:1;overflow-y:auto;padding:20px;max-width:760px;width:100%;margin:0 auto;display:none}
@@ -46,7 +45,6 @@ button{cursor:pointer}
 .input-area{padding:10px 14px 14px;max-width:760px;width:100%;margin:0 auto}
 .input-box{background:#303030;border-radius:28px;padding:6px 8px 6px 6px;display:flex;align-items:flex-end;gap:8px;position:relative}
 .plus{width:36px;height:36px;border-radius:50%;border:1px solid #555;display:grid;place-items:center;cursor:pointer;flex-shrink:0;background:#303030;font-size:20px;color:#aaa}
-.plus:hover{background:#3a3a3a}
 .inp{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:16px;resize:none;max-height:120px;min-height:24px;padding:8px 0;line-height:1.4}
 .send{width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:0;display:grid;place-items:center;font-weight:800;flex-shrink:0}
 .tools{position:absolute;bottom:58px;left:0;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:16px;padding:8px;width:320px;max-width:90vw;display:none;z-index:20;box-shadow:0 10px 30px #000c}
@@ -54,11 +52,11 @@ button{cursor:pointer}
 .t-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer}
 .t-item:hover{background:#3a3a3a}
 .t-ico{width:28px;height:28px;border-radius:50%;background:#3f3f3f;display:grid;place-items:center;font-size:14px;flex-shrink:0}
-.t-txt{font-size:13.5px}
-.t-sub{font-size:11px;color:#999}
+.topMenu{position:absolute;top:42px;right:0;width:220px;background:#2a2a2a;border-radius:14px;padding:6px;display:none;z-index:100;box-shadow:0 10px 30px #000}
+.topMenu.show{display:block}
 .bottom-note{text-align:center;font-size:10px;color:#666;margin-top:8px}
 .hamburger{display:none;font-size:20px;cursor:pointer;padding:4px}
-.side-user{margin-top:auto;border-top:1px solid #222;padding-top:10px;display:flex;align-items:center;gap:8px;padding:10px;cursor:pointer;border-radius:8px}
+.side-user{margin-top:auto;border-top:1px solid #222;padding:10px;display:flex;align-items:center;gap:8px;cursor:pointer;border-radius:8px}
 .side-user:hover{background:#212121}
 @media(max-width:900px){
 .sidebar{position:fixed;left:0;top:0;height:100%;height:100dvh;z-index:50;transform:translateX(-100%);width:280px}
@@ -70,9 +68,6 @@ button{cursor:pointer}
 .tools{width:94vw;left:50%;transform:translateX(-50%);bottom:62px}
 .overlay{display:none;position:fixed;inset:0;background:#0008;z-index:40}
 .overlay.show{display:block}
-}
-@media(min-width:901px){
-.overlay{display:none!important}
 }
 </style>
 </head>
@@ -86,16 +81,24 @@ button{cursor:pointer}
 <div class="sb-item">📚 Library</div>
 <div class="sb-sec">Recents</div>
 <div id="history"></div>
-<div class="side-user" id="sideUser" onclick="handleSideUserClick()">
-<img id="sideAv" src="logo.png" class="avatar-sm"><div><div id="sideName" style="font-size:13px">Moco.</div><div style="font-size:11px;color:#777">Free • Scarlet</div></div>
-</div>
+<div class="side-user" id="sideUser"><img id="sideAv" src="logo.png" class="avatar-sm"><div><div id="sideName" style="font-size:13px">Moco.</div><div style="font-size:11px;color:#777">Free • Scarlet</div></div></div>
 </div>
 
 <div class="main">
 <div class="topbar">
 <div class="top-left"><span class="hamburger" onclick="toggleSidebar()">☰</span><div class="chat-work"><span class="active">Chat</span><span style="color:#999">+ Work</span></div></div>
 <div class="top-center"><img src="logo.png"> Scarlet AI</div>
-<div class="top-right"><span id="credit" class="credit">6/6</span><button class="login" id="loginBtn">Log in</button><button class="logout" id="logoutBtn" style="display:none">Log out</button><div id="userInfo" style="display:none"></div><img src="logo.png" id="mobAvatar" class="avatar-sm" style="display:none"></div>
+<div class="top-right">
+<span id="credit" class="credit">6/6</span>
+<button class="login" id="loginBtn">Log in</button>
+<div id="topUserWrap" style="display:none;position:relative">
+<img id="topAv" src="logo.png" class="avatar-sm" onclick="document.getElementById('topMenu').classList.toggle('show')">
+<div id="topMenu" class="topMenu">
+<div style="padding:10px 12px;border-bottom:1px solid #333"><div id="topName" style="font-size:13px">Moco.</div><small style="color:#888">Free • Scarlet</small></div>
+<div style="padding:10px 12px;cursor:pointer;border-radius:8px" onclick="doLogout()">🚪 Log out</div>
+</div>
+</div>
+</div>
 </div>
 
 <div class="center" id="centerBox"><div class="ready">Ready when you are.</div></div>
@@ -108,11 +111,11 @@ button{cursor:pointer}
 <button class="send" id="sendBtn">↑</button>
 <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none">
 <div class="tools" id="tools">
-<div class="t-item" data-action="photo"><div class="t-ico">📎</div><div><div class="t-txt">Add photos & files</div><div class="t-sub">Upload from device</div></div></div>
-<div class="t-item" data-action="image"><div class="t-ico" style="color:#6ab7ff">🎨</div><div><div class="t-txt">Create image</div><div class="t-sub">Visualize with Scarlet</div></div></div>
-<div class="t-item" data-action="web"><div class="t-ico" style="color:#4a9eff">🌐</div><div><div class="t-txt">Web search</div><div class="t-sub">Real-time info</div></div></div>
-<div class="t-item" data-action="deep"><div class="t-ico">✦</div><div><div class="t-txt">Deep research</div><div class="t-sub">Detailed report</div></div></div>
-<div class="t-item" data-action="think"><div class="t-ico">🧠</div><div><div class="t-txt">Thinking</div><div class="t-sub">Reasoning mode</div></div></div>
+<div class="t-item" data-action="photo"><div class="t-ico">📎</div><div><div>Add photos & files</div></div></div>
+<div class="t-item" data-action="image"><div class="t-ico">🎨</div><div><div>Create image</div></div></div>
+<div class="t-item" data-action="web"><div class="t-ico">🌐</div><div><div>Web search</div></div></div>
+<div class="t-item" data-action="deep"><div class="t-ico">✦</div><div><div>Deep research</div></div></div>
+<div class="t-item" data-action="think"><div class="t-ico">🧠</div><div><div>Thinking</div></div></div>
 </div>
 </div>
 <div class="bottom-note">Scarlet AI can make mistakes. Check important info.</div>
@@ -128,35 +131,43 @@ function initGSI(){if(!window.google||!google.accounts){setTimeout(initGSI,500);
 initGSI();
 document.getElementById('loginBtn').onclick=()=>google.accounts.id.prompt();
 
-// --- ONLY ADDED LOGOUT LOGIC ---
-document.getElementById('logoutBtn').onclick=()=>{auth.signOut().then(()=>location.reload())};
-function handleSideUserClick(){if(auth.currentUser){if(confirm('Log out pannava da Moco?')){auth.signOut().then(()=>location.reload())}}}
+// PER USER CHATS FIX
+let currentUid='guest';
+function getChatKey(){return 'scarlet_chats_'+currentUid;}
+let chats=[];
+function loadChatsForUser(){chats=JSON.parse(localStorage.getItem(getChatKey())||"[]");renderHistory();chatEl.innerHTML='';centerBox.style.display='flex';chatEl.classList.remove('active');}
+function saveChats(){localStorage.setItem(getChatKey(),JSON.stringify(chats));renderHistory();}
+function doLogout(){if(confirm('Log out pannava?'))auth.signOut().then(()=>location.reload());}
+document.getElementById('sideUser').onclick=()=>{if(auth.currentUser)doLogout();};
 
 auth.onAuthStateChanged(u=>{
-  const loginBtn=document.getElementById('loginBtn');
-  const logoutBtn=document.getElementById('logoutBtn');
-  const userInfo=document.getElementById('userInfo');
   if(u){
-    loginBtn.style.display='none';
-    logoutBtn.style.display='block';
-    userInfo.style.display='flex';
-    userInfo.innerHTML=`<img src="${u.photoURL||'logo.png'}" class="avatar-sm">`;
+    currentUid=u.uid;
+    document.getElementById('loginBtn').style.display='none';
+    document.getElementById('topUserWrap').style.display='block';
+    document.getElementById('topAv').src=u.photoURL||'logo.png';
     document.getElementById('sideAv').src=u.photoURL||'logo.png';
     document.getElementById('sideName').innerText=u.displayName||'Moco.';
+    document.getElementById('topName').innerText=u.displayName||'Moco.';
   }else{
-    loginBtn.style.display='block';
-    logoutBtn.style.display='none';
-    userInfo.style.display='none';
+    currentUid='guest';
+    document.getElementById('loginBtn').style.display='block';
+    document.getElementById('topUserWrap').style.display='none';
     document.getElementById('sideAv').src='logo.png';
     document.getElementById('sideName').innerText='Moco.';
   }
+  loadChatsForUser();
+  getCredits();
 });
 
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
 let mode='chat';
 const plusBtn=document.getElementById('plusBtn'),tools=document.getElementById('tools'),fileInput=document.getElementById('fileInput'),inp=document.getElementById('inp'),chatEl=document.getElementById('chat'),centerBox=document.getElementById('centerBox'),historyEl=document.getElementById('history');
 plusBtn.onclick=(e)=>{e.stopPropagation();tools.classList.toggle('show');};
-document.addEventListener('click',e=>{if(!e.target.closest('#inputBox')) tools.classList.remove('show');});
+document.addEventListener('click',e=>{
+ if(!e.target.closest('#inputBox')) tools.classList.remove('show');
+ if(!e.target.closest('#topUserWrap')) document.getElementById('topMenu').classList.remove('show');
+});
 function showChat(){if(centerBox.style.display!=='none'){centerBox.style.display='none';chatEl.classList.add('active');}}
 function addMsg(role,text,img){
  showChat();const d=document.createElement('div');d.className='msg'+(role==='user'?' user-row':'');
@@ -164,42 +175,11 @@ function addMsg(role,text,img){
  else{d.innerHTML=`<img class="msg-avatar" src="logo.png"><div class="bubble">${text}${img?`<br><img src="${img}" style="max-width:100%;max-height:380px;border-radius:12px;margin-top:8px;display:block">`:''}</div>`;}
  chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;
 }
-function getCredits(){const k='img_use_'+new Date().toDateString();let u=parseInt(localStorage.getItem(k)||"0");if(isNaN(u))u=0;document.getElementById('credit').innerText=`${6-u}/6`;return {u,k};}getCredits();
-let chats=JSON.parse(localStorage.getItem('scarlet_chats')||"[]");
-function renderHistory(){historyEl.innerHTML='';chats.slice().reverse().forEach(c=>{const d=document.createElement('div');d.className='sb-recent';d.innerText=c.title;historyEl.appendChild(d);});}renderHistory();
+function getCredits(){const k='img_use_'+new Date().toDateString();let u=parseInt(localStorage.getItem(k)||"0");if(isNaN(u))u=0;document.getElementById('credit').innerText=`${6-u}/6`;return {u,k};}
+function renderHistory(){historyEl.innerHTML='';chats.slice().reverse().forEach(c=>{const d=document.createElement('div');d.className='sb-recent';d.innerText=c.title;historyEl.appendChild(d);});}
 document.querySelectorAll('.t-item').forEach(el=>{
  el.onclick=()=>{
   const a=el.dataset.action;tools.classList.remove('show');
   if(a==='photo'){fileInput.click();}
-  if(a==='image'){mode='image';inp.placeholder='Describe image...';addMsg('ai','Image mode ON da Moco! 🎨 What to create?');}
-  if(a==='web'){mode='web';inp.placeholder='Search the web...';addMsg('ai','Web search ON! 🌐');}
-  if(a==='deep'){mode='deep';addMsg('ai','Deep research ON! ✦');}
-  if(a==='think'){mode='think';addMsg('ai','Thinking ON! 🧠');}
-  inp.focus();
- };
-});
-fileInput.onchange=e=>{
- const f=e.target.files[0];if(!f) return;
- const r=new FileReader();r.onload=ev=>{addMsg('user',`File: ${f.name}`,ev.target.result);addMsg('ai',`Got "${f.name}" da Moco! ✨ What to do?`);};r.readAsDataURL(f);
-};
-async function send(){
- const q=inp.value.trim();if(!q) return;
- addMsg('user',q);inp.value='';inp.style.height='auto';tools.classList.remove('show');
- const isImg=mode==='image'||q.toLowerCase().includes('create image');
- const prompt=q.replace('create image','').replace('/image','').trim()||q;
- if(isImg){
-  let {u,k}=getCredits();if(u>=6){addMsg('ai','Daily 6 over da Moco!');return;}
-  addMsg('ai',`Generating "${prompt}"... 🔥`);
-  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
-  const img=new Image();img.src=url;img.onload=()=>{chatEl.lastChild.remove();addMsg('ai',prompt,url);localStorage.setItem(k,String(u+1));getCredits();chats.push({title:prompt.slice(0,30)});localStorage.setItem('scarlet_chats',JSON.stringify(chats));renderHistory();mode='chat';inp.placeholder='Ask anything';};img.onerror=()=>{chatEl.lastChild.remove();addMsg('ai','Failed da, retry!');}
- }else{
-  addMsg('ai','<span id="tmp">Thinking... ✨</span>');
-  try{const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?model=openai`);const txt=await res.text();document.getElementById('tmp').parentElement.innerText=txt;chats.push({title:q.slice(0,30)});localStorage.setItem('scarlet_chats',JSON.stringify(chats));renderHistory();}catch{ document.getElementById('tmp').innerText='Error da!';}
- }
-}
-document.getElementById('sendBtn').onclick=send;
-inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-inp.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
-</script>
-</body>
-</html>
+  if(a==='image'){mode='image';inp.placeholder='Describe image...';addMsg('ai','Image mode ON da Moco! 🎨');}
+  if(a==='web'){mode='web';addMsg('ai','Web search ON! 🌐');}
