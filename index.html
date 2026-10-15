@@ -1,79 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scarlet AI</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:system-ui;min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a;z-index:10}
-.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px}
-.logo-img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #ff0040;box-shadow:0 0 18px rgba(255,0,64,0.6)}
-.credit{font-size:12px;color:#aaa;border:1px solid #333;padding:6px 12px;border-radius:20px}
-.login-btn{background:#fff;color:#000;border:0;padding:8px 18px;border-radius:20px;font-weight:700;cursor:pointer}
-#userInfo{display:none;font-size:14px}
-.main{max-width:700px;margin:0 auto;padding:20px}
-.card{background:#141414;border:1px solid #222;border-radius:16px;padding:20px;margin-top:20px}
-textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:14px;color:#fff;resize:none;font-size:15px;outline:none}
-.gen-btn{width:100%;margin-top:16px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:14px;border-radius:12px;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
-#result img{width:100%;border-radius:12px;margin-top:12px}
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#fff;font-family:system-ui}header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a} .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px} .logo-img{width:42px;height:42px;border-radius:50%;border:2px solid #ff0040} .credit{font-size:12px;color:#aaa;border:1px solid #333;padding:6px 12px;border-radius:20px} .login-btn{background:#fff;color:#000;border:0;padding:8px 18px;border-radius:20px;font-weight:700;cursor:pointer} .main{max-width:700px;margin:0 auto;padding:20px} .card{background:#141414;border:1px solid #222;border-radius:16px;padding:20px;margin-top:20px} textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:14px;color:#fff;resize:none} .gen-btn{width:100%;margin-top:16px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:14px;border-radius:12px;color:#fff;font-weight:700;font-size:16px;cursor:pointer} #result img{width:100%;border-radius:12px;margin-top:12px}
 </style>
 </head>
 <body>
 <header>
 <div class="logo"><img src="logo.png" class="logo-img"> Scarlet AI</div>
-<div style="display:flex;gap:12px;align-items:center">
+<div style="display:flex;gap:10px;align-items:center">
 <div class="credit" id="credit">6/6 Credits</div>
-<button class="login-btn" id="loginBtn">Login</button>
-<div id="userInfo"></div>
+<button class="login-btn" id="loginBtn" onclick="loginNow()">Login</button>
+<span id="userInfo" style="display:none"></span>
 </div>
 </header>
 <div class="main">
 <div class="card">
-<h3 style="margin-bottom:12px">✨ Create Image</h3>
+<h3>✨ Create Image</h3>
 <textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city..."></textarea>
 <button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
 <div id="result"></div>
 </div>
 </div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-const firebaseConfig = { apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE", authDomain: "scarlet-ai-fa68c.firebaseapp.com", projectId: "scarlet-ai-fa68c", storageBucket: "scarlet-ai-fa68c.firebasestorage.app", messagingSenderId: "145131745721", appId: "1:145131745721:web:dfa412973efb2f37c3c668" };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+<script>
+const firebaseConfig = { apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE", authDomain: "scarlet-ai-fa68c.firebaseapp.com", projectId: "scarlet-ai-fa68c" };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-getRedirectResult(auth).then((res)=>{
-  if(res && res.user){ console.log("Logged in"); }
-}).catch(e=>{ alert("Auth Error: "+e.message); });
+function loginNow(){
+  document.getElementById('loginBtn').innerText = "Redirecting...";
+  auth.signInWithRedirect(provider);
+}
 
-document.getElementById('loginBtn').onclick = () => {
-  signInWithRedirect(auth, provider);
-};
+auth.getRedirectResult().then(r=>{ if(r.user) console.log("Logged in"); }).catch(e=>alert("Login Error: "+e.message));
 
-window.logout = async () => { await signOut(auth); location.reload(); };
-
-onAuthStateChanged(auth, (user) => {
+auth.onAuthStateChanged(user=>{
   if(user){
-    const btn=document.getElementById('loginBtn');
-    btn.style.display='none';
-    const i=document.getElementById('userInfo');
-    i.style.display='block';
-    i.innerHTML=`👤 ${user.displayName.split(' ')[0]} <button onclick="logout()" style="margin-left:8px;padding:4px 10px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;cursor:pointer;">Logout</button>`;
+    document.getElementById('loginBtn').style.display='none';
+    const u=document.getElementById('userInfo');
+    u.style.display='block';
+    u.innerHTML=`👤 ${user.displayName} <button onclick="auth.signOut().then(()=>location.reload())" style="margin-left:8px;padding:4px 10px;border-radius:10px;background:#222;color:#fff;border:1px solid #333">Logout</button>`;
   }
 });
 
-function getCredits(){ const d=new Date().toDateString(); const key='img_use_'+d; let used = parseInt(localStorage.getItem(key) || "0"); if(isNaN(used) || used>6){ used=0; localStorage.setItem(key,"0"); } document.getElementById('credit').innerText = `${6-used}/6 Credits`; return {used, key}; }
-getCredits();
-document.getElementById('genBtn').onclick = () => {
+function getCredits(){ const k='img_use_'+new Date().toDateString(); let u=parseInt(localStorage.getItem(k)||"0"); if(isNaN(u)||u>6){u=0;localStorage.setItem(k,"0");} document.getElementById('credit').innerText=`${6-u}/6 Credits`; return {u,k}; } getCredits();
+document.getElementById('genBtn').onclick=()=>{
   const p=document.getElementById('prompt').value.trim(); if(!p) return alert("Prompt type pannu da!");
-  let {used, key} = getCredits(); if(used>=6) return alert("Daily 6 over!");
-  const btn=document.getElementById('genBtn'); btn.disabled=true; btn.innerText="Generating... 🔥";
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=1024&height=1024&seed=${Math.floor(Math.random()*99999)}&nologo=true`;
-  document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false; document.getElementById('genBtn').innerText='Generate (1 Credit)'">`;
-  localStorage.setItem(key, String(used+1)); getCredits();
+  let {u,k}=getCredits(); if(u>=6) return alert("Daily over!");
+  const b=document.getElementById('genBtn'); b.disabled=true; b.innerText="Generating... 🔥";
+  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true`;
+  document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').innerText='Generate (1 Credit)'">`;
+  localStorage.setItem(k,String(u+1)); getCredits();
 };
 </script>
 </body>
