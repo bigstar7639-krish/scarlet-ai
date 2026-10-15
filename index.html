@@ -5,127 +5,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Scarlet AI</title>
 <link rel="icon" href="logo.png">
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:system-ui;height:100vh;height:100dvh;overflow:hidden;display:flex}
-.sidebar{width:260px;background:#171717;display:flex;flex-direction:column;padding:10px;flex-shrink:0;overflow:hidden;transition:transform.25s;position:relative}
-.sidebar.mob{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);z-index:20}
-.sidebar.mob.open{transform:translateX(0)}
-.sb-head{display:flex;align-items:center;justify-content:space-between;padding:6px 8px}
-.sb-logo{font-weight:700;font-size:16px;display:flex;gap:8px;align-items:center}
-.new{width:100%;padding:10px;background:#212121;border:0;color:#fff;border-radius:10px;cursor:pointer;display:flex;gap:8px;margin:8px 0}
-.mitem{padding:10px 8px;border-radius:8px;cursor:pointer;color:#ececec;font-size:14px;display:flex;gap:10px}
-.mitem:hover{background:#212121}
-.recent-title{color:#8a8a8a;font-size:13px;padding:14px 8px 6px}
-.list{flex:1;overflow-y:auto}
-.recent{padding:8px;border-radius:8px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;color:#c7c7c7}
-.recent:hover,.recent.active{background:#212121;color:#fff}
-.user{padding:10px 8px;border-top:1px solid #222;display:flex;gap:10px;align-items:center;cursor:pointer;margin-top:auto;position:relative}
-.av{width:32px;height:32px;background:#ff0040;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold}
-.main{flex:1;display:flex;flex-direction:column;background:#212121;min-width:0;position:relative}
-.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #2a2a2a}
-.center{flex:1;display:flex;align-items:center;justify-content:center;font-size:22px;padding:20px;text-align:center}
-.chat{flex:1;overflow:auto;padding:20px;max-width:800px;margin:0 auto;width:100%;display:none;flex-direction:column;gap:12px}
-.bubble{padding:12px 16px;border-radius:18px;max-width:85%;word-break:break-word}
-.bubble.user{background:#2f2f2f;align-self:flex-end;border-bottom-right-radius:6px}
-.bubble.ai{align-self:flex-start}
-.bubble img{max-width:100%;border-radius:12px;margin-top:8px}
-.inputWrap{padding:12px;display:flex;justify-content:center;background:#212121;position:relative}
-.box{width:100%;max-width:760px;background:#303030;border-radius:28px;padding:8px 12px;display:flex;align-items:flex-end;gap:8px}
-.box textarea{flex:1;background:transparent;border:0;color:#fff;outline:none;resize:none;min-height:24px;max-height:120px;font-size:16px;padding:8px 0}
-.icon{width:36px;height:36px;border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.icon.plus{background:#3a3a3a;color:#fff}
-.icon.send{background:#fff;color:#000}
-.plusMenu{position:absolute;bottom:70px;left:12px;max-width:320px;width:90%;background:#2e2e2e;border-radius:20px;padding:6px;display:none;z-index:30}
-.plusMenu.show{display:block}
-.opt{padding:12px 14px;display:flex;gap:12px;cursor:pointer;border-radius:12px}
-.opt:hover{background:#3a3a3a}
-.userMenu{position:absolute;bottom:70px;left:10px;width:240px;background:#2a2a2a;border-radius:14px;padding:6px;display:none;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-.userMenu.show{display:block}
-#sketch{position:fixed;inset:0;background:#000;z-index:999;display:none;flex-direction:column}
-#draw{flex:1;background:#111;touch-action:none}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10;display:none}
+body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:row}
+button{cursor:pointer}
+.sidebar{width:260px;background:#171717;display:flex;flex-direction:column;padding:10px;flex-shrink:0;overflow-y:auto;transition:transform.25s}
+.sb-logo{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;padding:10px 8px}
+.sb-logo img{width:22px;height:22px;border-radius:50%;border:1px solid #ff0040;object-fit:cover}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13.5px;color:#ececec;cursor:pointer}
+.sb-item:hover{background:#2f2f2f}
+.sb-item.active{background:#212121}
+.sb-sec{margin-top:18px;padding:0 10px;font-size:11px;color:#8a8a8a;letter-spacing:.3px}
+.sb-recent{padding:7px 10px;border-radius:8px;font-size:13px;color:#b4b4b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-recent:hover{background:#212121;color:#fff}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#000;position:relative}
+.topbar{height:56px;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #1a1a1a;gap:8px}
+.top-left{display:flex;align-items:center;gap:10px}
+.chat-work{background:#1e1e1e;border-radius:20px;padding:3px;display:flex;gap:2px}
+.chat-work span{padding:5px 12px;border-radius:16px;font-size:13px;cursor:pointer}
+.chat-work.active{background:#2f2f2f;color:#fff}
+.top-center{position:absolute;left:50%;transform:translateX(-50%);font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.top-center img{width:20px;height:20px;border-radius:50%;border:1px solid #ff0040;object-fit:cover}
+.top-right{display:flex;align-items:center;gap:8px}
+.credit{font-size:11px;border:1px solid #333;padding:4px 8px;border-radius:20px;color:#aaa}
+.login{background:#fff;color:#000;padding:7px 16px;border-radius:20px;border:0;font-weight:600;font-size:13px}
+.logout{background:#222;color:#fff;padding:7px 16px;border-radius:20px;border:1px solid #333;font-weight:600;font-size:13px}
+.avatar-sm{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid #ff0040}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center}
+.ready{font-size:clamp(22px,5vw,30px);font-weight:400;letter-spacing:-.5px}
+.chat{flex:1;overflow-y:auto;padding:20px;max-width:760px;width:100%;margin:0 auto;display:none}
+.chat.active{display:block}
+.msg{display:flex;gap:12px;margin:18px 0}
+.msg-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;border:1px solid #ff0040;flex-shrink:0}
+.bubble{font-size:15px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-width:90%}
+.user-row{justify-content:flex-end}
+.user-bub{background:#2f2f2f;padding:10px 16px;border-radius:18px;max-width:75%;font-size:14.5px}
+.input-area{padding:10px 14px 14px;max-width:760px;width:100%;margin:0 auto}
+.input-box{background:#303030;border-radius:28px;padding:6px 8px 6px 6px;display:flex;align-items:flex-end;gap:8px;position:relative}
+.plus{width:36px;height:36px;border-radius:50%;border:1px solid #555;display:grid;place-items:center;cursor:pointer;flex-shrink:0;background:#303030;font-size:20px;color:#aaa}
+.plus:hover{background:#3a3a3a}
+.inp{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:16px;resize:none;max-height:120px;min-height:24px;padding:8px 0;line-height:1.4}
+.send{width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:0;display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.tools{position:absolute;bottom:58px;left:0;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:16px;padding:8px;width:320px;max-width:90vw;display:none;z-index:20;box-shadow:0 10px 30px #000c}
+.tools.show{display:block}
+.t-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer}
+.t-item:hover{background:#3a3a3a}
+.t-ico{width:28px;height:28px;border-radius:50%;background:#3f3f3f;display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.t-txt{font-size:13.5px}
+.t-sub{font-size:11px;color:#999}
+.bottom-note{text-align:center;font-size:10px;color:#666;margin-top:8px}
+.hamburger{display:none;font-size:20px;cursor:pointer;padding:4px}
+.side-user{margin-top:auto;border-top:1px solid #222;padding-top:10px;display:flex;align-items:center;gap:8px;padding:10px;cursor:pointer;border-radius:8px}
+.side-user:hover{background:#212121}
+@media(max-width:900px){
+.sidebar{position:fixed;left:0;top:0;height:100%;height:100dvh;z-index:50;transform:translateX(-100%);width:280px}
+.sidebar.open{transform:translateX(0)}
+.hamburger{display:block}
+.top-center{font-size:13px}
+.chat-work{display:none}
+.input-area{padding:8px 10px 10px}
+.tools{width:94vw;left:50%;transform:translateX(-50%);bottom:62px}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:40}
 .overlay.show{display:block}
+}
+@media(min-width:901px){
+.overlay{display:none!important}
+}
 </style>
 </head>
 <body>
-<div class="overlay" id="ov" onclick="toggleMob(false)"></div>
-<div class="sidebar" id="side">
-<div class="sb-head"><div class="sb-logo">Scarlet AI</div><span style="background:#2a2a2a;padding:2px 8px;border-radius:12px;font-size:12px">v1.5</span></div>
-<button class="new" onclick="newChat()">✎ New chat</button>
-<div class="mitem" onclick="openImages()">🖼️ Images</div>
-<div class="mitem" onclick="openScheduled()">🕒 Scheduled</div>
-<div class="mitem" onclick="openLibrary()">📚 Library</div>
-<div class="recent-title">Recents</div>
-<div class="list" id="recentList"></div>
-<div class="user" id="userBtn" onclick="toggleUserMenu()"><div class="av">M</div><div><div>MocƆ</div><small style="color:#888">Free • Scarlet</small></div></div>
-<div class="userMenu" id="userMenu">
-<div style="padding:10px 12px;font-size:14px;border-bottom:1px solid #333">MocƆ<br><small style="color:#888">Free • Scarlet</small></div>
-<div class="opt" onclick="logout()">🚪 Log out</div>
-<div class="opt" style="color:#ff6b6b" onclick="clearAll()">🗑️ Clear all chats</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+<div class="sb-logo"><img src="logo.png"> Scarlet AI <span style="margin-left:auto;font-size:10px;background:#222;padding:3px 6px;border-radius:6px">v1.5</span></div>
+<div class="sb-item active">✎ New chat</div>
+<div class="sb-item">🖼️ Images</div>
+<div class="sb-item">🕒 Scheduled</div>
+<div class="sb-item">📚 Library</div>
+<div class="sb-sec">Recents</div>
+<div id="history"></div>
+<div class="side-user" id="sideUser" onclick="handleSideUserClick()">
+<img id="sideAv" src="logo.png" class="avatar-sm"><div><div id="sideName" style="font-size:13px">Moco.</div><div style="font-size:11px;color:#777">Free • Scarlet</div></div>
 </div>
 </div>
+
 <div class="main">
-<div class="topbar"><div style="display:flex;gap:10px;align-items:center"><span onclick="toggleMob()" style="cursor:pointer;font-size:20px">☰</span><b>Scarlet AI</b></div><span style="background:#2a2a2a;padding:4px 8px;border-radius:12px;font-size:12px">1/6</span></div>
-<div class="center" id="center">What's on your mind today?</div>
+<div class="topbar">
+<div class="top-left"><span class="hamburger" onclick="toggleSidebar()">☰</span><div class="chat-work"><span class="active">Chat</span><span style="color:#999">+ Work</span></div></div>
+<div class="top-center"><img src="logo.png"> Scarlet AI</div>
+<div class="top-right"><span id="credit" class="credit">6/6</span><button class="login" id="loginBtn">Log in</button><button class="logout" id="logoutBtn" style="display:none">Log out</button><div id="userInfo" style="display:none"></div><img src="logo.png" id="mobAvatar" class="avatar-sm" style="display:none"></div>
+</div>
+
+<div class="center" id="centerBox"><div class="ready">Ready when you are.</div></div>
 <div class="chat" id="chat"></div>
-<div class="inputWrap">
-<div class="plusMenu" id="plusMenu">
-<div class="opt" onclick="openCamera()">📷 Camera</div>
-<div class="opt" onclick="openPhotos()">🖼️ Photos</div>
-<div class="opt" onclick="openFiles()">📎 Files</div>
-<div class="opt" onclick="createImg()">🎨 Create image</div>
-<div class="opt" onclick="openSketch()">✏️ Sketch</div>
-<div class="opt" onclick="thinking()">💭 Thinking</div>
-<div class="opt" onclick="webSearch()">🌐 Web search</div>
-<div class="opt" onclick="deepResearch()">🔬 Deep research</div>
-</div>
-<div class="box">
-<button class="icon plus" onclick="togglePlus()">+</button>
-<textarea id="q" placeholder="Ask anything" rows="1" oninput="autoGrow(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-<button class="icon" onclick="voice()">🎤</button>
-<button class="icon send" onclick="send()">↑</button>
+
+<div class="input-area">
+<div class="input-box" id="inputBox">
+<div class="plus" id="plusBtn">+</div>
+<textarea class="inp" id="inp" placeholder="Ask anything" rows="1"></textarea>
+<button class="send" id="sendBtn">↑</button>
+<input type="file" id="fileInput" accept="image/*,.pdf" style="display:none">
+<div class="tools" id="tools">
+<div class="t-item" data-action="photo"><div class="t-ico">📎</div><div><div class="t-txt">Add photos & files</div><div class="t-sub">Upload from device</div></div></div>
+<div class="t-item" data-action="image"><div class="t-ico" style="color:#6ab7ff">🎨</div><div><div class="t-txt">Create image</div><div class="t-sub">Visualize with Scarlet</div></div></div>
+<div class="t-item" data-action="web"><div class="t-ico" style="color:#4a9eff">🌐</div><div><div class="t-txt">Web search</div><div class="t-sub">Real-time info</div></div></div>
+<div class="t-item" data-action="deep"><div class="t-ico">✦</div><div><div class="t-txt">Deep research</div><div class="t-sub">Detailed report</div></div></div>
+<div class="t-item" data-action="think"><div class="t-ico">🧠</div><div><div class="t-txt">Thinking</div><div class="t-sub">Reasoning mode</div></div></div>
 </div>
 </div>
+<div class="bottom-note">Scarlet AI can make mistakes. Check important info.</div>
 </div>
-<input type="file" id="pIn" accept="image/*" hidden onchange="onPhoto(this)">
-<input type="file" id="fIn" hidden onchange="onFile(this)">
-<div id="sketch"><div style="padding:10px;display:flex;gap:10px;background:#111"><button onclick="clearDraw()" style="padding:8px 12px;background:#222;color:#fff;border:0;border-radius:8px">Clear</button><button onclick="closeSketch()" style="padding:8px 12px;background:#ff0040;color:#fff;border:0;border-radius:8px">Save</button><input type="color" id="col" value="#ff0040"><input type="range" id="sz" min="1" max="20" value="4"></div><canvas id="draw"></canvas></div>
+</div>
+
 <script>
-let chats=JSON.parse(localStorage.getItem('scarlet_chats')||'[]'),curId=null;
-let chatEl=document.getElementById('chat'),centerEl=document.getElementById('center'),qEl=document.getElementById('q'),recentEl=document.getElementById('recentList');
-function save(){localStorage.setItem('scarlet_chats',JSON.stringify(chats));renderRecents()}
-function renderRecents(){recentEl.innerHTML='';chats.slice().reverse().forEach(c=>{let d=document.createElement('div');d.className='recent'+(c.id===curId?' active':'');d.textContent=c.title||'Hi';d.onclick=()=>loadChat(c.id);recentEl.appendChild(d)})}
-function newChat(){curId=Date.now().toString();chats.push({id:curId,title:'Hi',msgs:[]});save();chatEl.innerHTML='';chatEl.style.display='none';centerEl.style.display='flex';toggleMob(false)}
-function loadChat(id){curId=id;let c=chats.find(x=>x.id===id);chatEl.innerHTML='';c.msgs.forEach(m=>addBubble(m.role,m.html,false));chatEl.style.display='flex';centerEl.style.display='none';renderRecents();toggleMob(false)}
-function addBubble(role,html,doSave=true){centerEl.style.display='none';chatEl.style.display='flex';let d=document.createElement('div');d.className='bubble '+(role==='user'?'user':'ai');d.innerHTML=html;chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;if(doSave&&curId){let cc=chats.find(x=>x.id===curId);cc.msgs.push({role,html});if(cc.msgs.length===1)cc.title=html.replace(/<[^>]*>/g,'').slice(0,30);save()}}
-function send(){let v=qEl.value.trim();if(!v){if(!curId)newChat();return}if(!curId)newChat();addBubble('user',v);qEl.value='';autoGrow(qEl);setTimeout(()=>addBubble('ai',v),300);document.getElementById('plusMenu').classList.remove('show')}
-function autoGrow(el){el.style.height='auto';el.style.height=el.scrollHeight+'px'}
-function toggleMob(f){let s=document.getElementById('side'),ov=document.getElementById('ov');if(window.innerWidth>768)return;if(f===false){s.classList.remove('open');ov.classList.remove('show');return}let o=s.classList.contains('open');if(o){s.classList.remove('open');ov.classList.remove('show')}else{s.classList.add('mob');s.classList.add('open');ov.classList.add('show')}}
-if(window.innerWidth<=768)document.getElementById('side').classList.add('mob');
-function togglePlus(){document.getElementById('plusMenu').classList.toggle('show');document.getElementById('userMenu').classList.remove('show')}
-function toggleUserMenu(){let m=document.getElementById('userMenu');m.classList.toggle('show');document.getElementById('plusMenu').classList.remove('show')}
-function logout(){if(confirm('Log out pannava?')){try{if(window.firebase&&firebase.auth)firebase.auth().signOut()}catch(e){}localStorage.removeItem('scarlet_chats');location.reload()}}
-function clearAll(){if(confirm('All chats delete?')){localStorage.removeItem('scarlet_chats');location.reload()}}
-function openImages(){let imgs=[];chats.forEach(c=>c.msgs.forEach(m=>{let mt=m.html.match(/<img src="[^"]+"/g);if(mt)imgs=imgs.concat(mt)}));if(!imgs.length)addBubble('ai','No images yet');else addBubble('ai','🖼️ Images:<br>'+imgs.map(i=>i+'>').join('<br>'))}
-function openLibrary(){addBubble('ai','📚 Library: '+chats.length+' chats')}
-function openScheduled(){let t=prompt('Seconds:');if(!t)return;let msg=prompt('Message:');if(!msg)return;addBubble('ai','🕒 Scheduled '+t+'s');setTimeout(()=>addBubble('ai','⏰ '+msg),parseInt(t)*1000)}
-async function openCamera(){document.getElementById('plusMenu').classList.remove('show');try{let s=await navigator.mediaDevices.getUserMedia({video:true});let v=document.createElement('video');v.autoplay=true;v.srcObject=s;v.style.width='100%';let w=document.createElement('div');w.className='bubble ai';let b=document.createElement('button');b.textContent='Capture';b.style.cssText='padding:8px 14px;background:#ff0040;color:#fff;border:0;border-radius:8px;margin-top:8px';w.appendChild(v);w.appendChild(b);chatEl.appendChild(w);chatEl.style.display='flex';centerEl.style.display='none';b.onclick=()=>{let c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);let img=c.toDataURL();s.getTracks().forEach(x=>x.stop());w.remove();addBubble('user','<img src="'+img+'">')};}catch(e){addBubble('ai','Camera permission needed')}}
-function openPhotos(){document.getElementById('pIn').click()}
-function onPhoto(i){if(!i.files[0])return;let r=new FileReader();r.onload=e=>addBubble('user','<img src="'+e.target.result+'"><br>'+i.files[0].name);r.readAsDataURL(i.files[0])}
-function openFiles(){document.getElementById('fIn').click()}
-function onFile(i){if(!i.files[0])return;let f=i.files[0];let r=new FileReader();r.onload=e=>addBubble('user','📎 '+f.name+'<br><pre style="white-space:pre-wrap;background:#000;padding:8px;border-radius:8px;margin-top:6px">'+e.target.result.slice(0,2000)+'</pre>');if(f.type.startsWith('text')||f.name.endsWith('.json')||f.name.endsWith('.txt'))r.readAsText(f);else r.readAsDataURL(f)}
-function createImg(){let p=prompt('Prompt:');if(!p)return;let c=document.createElement('canvas');c.width=512;c.height=512;let ctx=c.getContext('2d');let g=ctx.createLinearGradient(0,0,512,512);g.addColorStop(0,'#ff0040');g.addColorStop(1,'#ff8800');ctx.fillStyle=g;ctx.fillRect(0,0,512,512);ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.textAlign='center';ctx.fillText('SCARLET AI',256,200);ctx.font='18px sans-serif';let words=p.split(' '),line='',y=250;for(let n=0;n<words.length;n++){let t=line+words[n]+' ';if(ctx.measureText(t).width>400&&n>0){ctx.fillText(line,256,y);line=words[n]+' ';y+=24}else line=t}ctx.fillText(line,256,y);addBubble('user','<img src="'+c.toDataURL()+'"><br>'+p)}
-let drawing=false,can,ctxd;
-function openSketch(){document.getElementById('sketch').style.display='flex';can=document.getElementById('draw');ctxd=can.getContext('2d');can.width=innerWidth;can.height=innerHeight-50;ctxd.lineCap='round';can.onpointerdown=e=>{drawing=true;ctxd.beginPath();ctxd.moveTo(e.clientX,e.clientY-can.getBoundingClientRect().top)};can.onpointermove=e=>{if(!drawing)return;ctxd.strokeStyle=document.getElementById('col').value;ctxd.lineWidth=document.getElementById('sz').value;ctxd.lineTo(e.clientX,e.clientY-can.getBoundingClientRect().top);ctxd.stroke()};can.onpointerup=()=>drawing=false}
-function clearDraw(){ctxd.clearRect(0,0,can.width,can.height)}
-function closeSketch(){let img=can.toDataURL();document.getElementById('sketch').style.display='none';addBubble('user','<img src="'+img+'">')}
-function thinking(){addBubble('ai','💭 Thinking...');setTimeout(()=>addBubble('ai','Done'),1000)}
-async function webSearch(){let q=prompt('Search:');if(!q)return;addBubble('user','Search: '+q);try{let r=await fetch('https://api.duckduckgo.com/?q='+encodeURIComponent(q)+'&format=json');let d=await r.json();addBubble('ai',d.AbstractText||'<a href="https://duckduckgo.com/?q='+encodeURIComponent(q)+'" target="_blank" style="color:#ff0040">Open '+q+'</a>')}catch(e){addBubble('ai','<a href="https://www.google.com/search?q='+encodeURIComponent(q)+'" target="_blank" style="color:#ff0040">Search '+q+'</a>')}}
-function deepResearch(){let q=prompt('Topic:');if(!q)return;addBubble('user','Research: '+q);['Collecting','Analyzing','Checking','Report'].forEach((s,i)=>setTimeout(()=>addBubble('ai',s+': '+q),(i+1)*700))}
-function voice(){let Rec=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Rec){addBubble('ai','Voice not supported');return}let r=new Rec();r.lang='en-IN';r.start();r.onresult=e=>{qEl.value=e.results[0][0].transcript;autoGrow(qEl)}}
-renderRecents();if(chats.length===0)newChat();else loadChat(chats[chats.length-1].id);
-document.addEventListener('click',e=>{if(!e.target.closest('#plusMenu')&&!e.target.closest('.plus'))document.getElementById('plusMenu').classList.remove('show');if(!e.target.closest('#userMenu')&&!e.target.closest('#userBtn'))document.getElementById('userMenu').classList.remove('show')});
+const firebaseConfig={apiKey:"AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",authDomain:"scarlet-ai-fa68c.firebaseapp.com",projectId:"scarlet-ai-fa68c",storageBucket:"scarlet-ai-fa68c.firebasestorage.app",messagingSenderId:"145131745721",appId:"1:145131745721:web:dfa412973efb2f37c3c668"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth();
+const GOOGLE_CLIENT_ID="145131745721-gu1u800lif4elinkbb09s06aktel90fr.apps.googleusercontent.com";
+function handleCred(r){const c=firebase.auth.GoogleAuthProvider.credential(r.credential);auth.signInWithCredential(c);}
+function initGSI(){if(!window.google||!google.accounts){setTimeout(initGSI,500);return;}google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCred,auto_select:false});}
+initGSI();
+document.getElementById('loginBtn').onclick=()=>google.accounts.id.prompt();
+
+// --- ONLY ADDED LOGOUT LOGIC ---
+document.getElementById('logoutBtn').onclick=()=>{auth.signOut().then(()=>location.reload())};
+function handleSideUserClick(){if(auth.currentUser){if(confirm('Log out pannava da Moco?')){auth.signOut().then(()=>location.reload())}}}
+
+auth.onAuthStateChanged(u=>{
+  const loginBtn=document.getElementById('loginBtn');
+  const logoutBtn=document.getElementById('logoutBtn');
+  const userInfo=document.getElementById('userInfo');
+  if(u){
+    loginBtn.style.display='none';
+    logoutBtn.style.display='block';
+    userInfo.style.display='flex';
+    userInfo.innerHTML=`<img src="${u.photoURL||'logo.png'}" class="avatar-sm">`;
+    document.getElementById('sideAv').src=u.photoURL||'logo.png';
+    document.getElementById('sideName').innerText=u.displayName||'Moco.';
+  }else{
+    loginBtn.style.display='block';
+    logoutBtn.style.display='none';
+    userInfo.style.display='none';
+    document.getElementById('sideAv').src='logo.png';
+    document.getElementById('sideName').innerText='Moco.';
+  }
+});
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+let mode='chat';
+const plusBtn=document.getElementById('plusBtn'),tools=document.getElementById('tools'),fileInput=document.getElementById('fileInput'),inp=document.getElementById('inp'),chatEl=document.getElementById('chat'),centerBox=document.getElementById('centerBox'),historyEl=document.getElementById('history');
+plusBtn.onclick=(e)=>{e.stopPropagation();tools.classList.toggle('show');};
+document.addEventListener('click',e=>{if(!e.target.closest('#inputBox')) tools.classList.remove('show');});
+function showChat(){if(centerBox.style.display!=='none'){centerBox.style.display='none';chatEl.classList.add('active');}}
+function addMsg(role,text,img){
+ showChat();const d=document.createElement('div');d.className='msg'+(role==='user'?' user-row':'');
+ if(role==='user'){d.innerHTML=`<div class="user-bub">${text}${img?`<br><img src="${img}" style="max-width:200px;max-height:200px;border-radius:12px;margin-top:6px">`:''}</div>`;}
+ else{d.innerHTML=`<img class="msg-avatar" src="logo.png"><div class="bubble">${text}${img?`<br><img src="${img}" style="max-width:100%;max-height:380px;border-radius:12px;margin-top:8px;display:block">`:''}</div>`;}
+ chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;
+}
+function getCredits(){const k='img_use_'+new Date().toDateString();let u=parseInt(localStorage.getItem(k)||"0");if(isNaN(u))u=0;document.getElementById('credit').innerText=`${6-u}/6`;return {u,k};}getCredits();
+let chats=JSON.parse(localStorage.getItem('scarlet_chats')||"[]");
+function renderHistory(){historyEl.innerHTML='';chats.slice().reverse().forEach(c=>{const d=document.createElement('div');d.className='sb-recent';d.innerText=c.title;historyEl.appendChild(d);});}renderHistory();
+document.querySelectorAll('.t-item').forEach(el=>{
+ el.onclick=()=>{
+  const a=el.dataset.action;tools.classList.remove('show');
+  if(a==='photo'){fileInput.click();}
+  if(a==='image'){mode='image';inp.placeholder='Describe image...';addMsg('ai','Image mode ON da Moco! 🎨 What to create?');}
+  if(a==='web'){mode='web';inp.placeholder='Search the web...';addMsg('ai','Web search ON! 🌐');}
+  if(a==='deep'){mode='deep';addMsg('ai','Deep research ON! ✦');}
+  if(a==='think'){mode='think';addMsg('ai','Thinking ON! 🧠');}
+  inp.focus();
+ };
+});
+fileInput.onchange=e=>{
+ const f=e.target.files[0];if(!f) return;
+ const r=new FileReader();r.onload=ev=>{addMsg('user',`File: ${f.name}`,ev.target.result);addMsg('ai',`Got "${f.name}" da Moco! ✨ What to do?`);};r.readAsDataURL(f);
+};
+async function send(){
+ const q=inp.value.trim();if(!q) return;
+ addMsg('user',q);inp.value='';inp.style.height='auto';tools.classList.remove('show');
+ const isImg=mode==='image'||q.toLowerCase().includes('create image');
+ const prompt=q.replace('create image','').replace('/image','').trim()||q;
+ if(isImg){
+  let {u,k}=getCredits();if(u>=6){addMsg('ai','Daily 6 over da Moco!');return;}
+  addMsg('ai',`Generating "${prompt}"... 🔥`);
+  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
+  const img=new Image();img.src=url;img.onload=()=>{chatEl.lastChild.remove();addMsg('ai',prompt,url);localStorage.setItem(k,String(u+1));getCredits();chats.push({title:prompt.slice(0,30)});localStorage.setItem('scarlet_chats',JSON.stringify(chats));renderHistory();mode='chat';inp.placeholder='Ask anything';};img.onerror=()=>{chatEl.lastChild.remove();addMsg('ai','Failed da, retry!');}
+ }else{
+  addMsg('ai','<span id="tmp">Thinking... ✨</span>');
+  try{const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?model=openai`);const txt=await res.text();document.getElementById('tmp').parentElement.innerText=txt;chats.push({title:q.slice(0,30)});localStorage.setItem('scarlet_chats',JSON.stringify(chats));renderHistory();}catch{ document.getElementById('tmp').innerText='Error da!';}
+ }
+}
+document.getElementById('sendBtn').onclick=send;
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+inp.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
 </script>
 </body>
 </html>
