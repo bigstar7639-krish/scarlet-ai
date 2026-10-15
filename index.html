@@ -1,51 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scarlet AI - OEV-1</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scarlet AI OEV-1</title>
 <style>
-body{margin:0;background:#000;color:#fff;font-family:sans-serif;text-align:center}
-.header{padding:30px;background:linear-gradient(135deg,#ff0040,#ff6600)}
-.logo{width:80px;border-radius:50%}
-.card{border:1px solid #333;margin:15px;padding:20px;border-radius:15px;background:#111}
-.btn{background:#ff0040;color:#fff;padding:12px 25px;border:none;border-radius:25px;font-size:16px}
-input{padding:12px;width:70%;background:#222;color:#fff;border:1px solid #333;border-radius:10px}
-#chat{height:300px;overflow-y:auto;text-align:left;padding:10px;background:#0a0a0a;margin:10px;border-radius:10px}
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:system-ui;height:100vh;display:flex;overflow:hidden}
+.sidebar{width:260px;background:#0a0a0a;border-right:1px solid #222;display:flex;flex-direction:column;transition:.3s}
+.sidebar.hide{margin-left:-260px}
+.top{padding:12px}.new{width:100%;padding:12px;background:#1a1a1a;border:0;color:#fff;border-radius:10px;cursor:pointer}
+.menu{flex:1;overflow:auto;padding:8px}.it{padding:10px 12px;border-radius:8px;cursor:pointer;color:#aaa;display:flex;gap:10px;margin:2px 0}.it:hover{background:#1a1a1a;color:#fff}
+.user{padding:12px;border-top:1px solid #1a1a1a;display:flex;gap:10px;align-items:center}.av{width:32px;height:32px;background:#ff0040;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.main{flex:1;display:flex;flex-direction:column;position:relative}
+.bar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #111}
+.model{font-weight:700;cursor:pointer}.model b{color:#ff0040}
+.center{flex:1;display:flex;align-items:center;justify-content:center;font-size:26px;text-align:center}
+.chats{flex:1;overflow:auto;padding:16px;max-width:800px;margin:0 auto;width:100%;display:none}
+.m{margin:12px 0;padding:12px;background:#111;border-radius:12px;word-break:break-word}.m.u{border:1px solid #00ff8822;background:#0a1a12}
+.m img{max-width:100%;border-radius:10px;margin-top:8px}
+.inputArea{padding:12px;display:flex;justify-content:center;position:relative}
+.box{width:100%;max-width:760px;background:#1e1e1e;border-radius:28px;padding:10px 14px;display:flex;align-items:center;gap:10px;border:1px solid #2a2a2a}
+.box input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:16px}
+.circle{width:38px;height:38px;background:#2a2a2a;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.circle.red{background:#ff0040}
+.plusMenu{position:absolute;bottom:70px;left:calc(50% - 300px);background:#1e1e1e;width:300px;border-radius:20px;border:1px solid #2a2a2a;display:none;z-index:99;max-height:70vh;overflow-y:auto}
+.plusMenu.show{display:block}
+.opt{padding:12px 14px;display:flex;gap:12px;align-items:center;cursor:pointer}.opt:hover{background:#2a2a2a}
+.ico{width:36px;height:36px;background:#2a2a2a;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#sketchBoard{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:999;display:none;flex-direction:column}
+#drawCanvas{flex:1;background:#0a0a0a;touch-action:none}
+.tools{padding:10px;display:flex;gap:10px;background:#111}
 </style>
 </head>
 <body>
-<div class="header">
-<img src="logo.png" class="logo">
-<h1>SCARLET AI</h1>
-<h3>OEV-1 | 4 in 1 | NO API KEY NEEDED 🔥</h3>
-<p>✅ Production Live - 1 minute ago</p>
+<div class="sidebar" id="side">
+<div class="top"><button class="new" onclick="newChat()">+ New chat</button></div>
+<div class="menu">
+<div class="it" onclick="showTab('Images')">🖼️ Images</div>
+<div class="it" onclick="showTab('Library')">📚 Library</div>
+<div class="it" onclick="showTab('Scheduled')">🕒 Scheduled</div>
+<div class="it" onclick="showTab('Plugins')">🔌 Plugins</div>
+<div class="it" onclick="showTab('Codex')">💻 Codex</div>
 </div>
-
-<div class="card">
-<h3>💬 Scarlet Chat</h3>
-<div id="chat"><div><b>Scarlet:</b> Hey da Moco! No Groq, No Error! Full free mode da! Enna help venum?</div></div>
-<input id="msg" placeholder="Type da...">
-<button class="btn" onclick="send()">Send</button>
+<div class="user"><div class="av">M</div><div>Moco.<br><small style="color:#666">Free</small></div></div>
 </div>
-
-<div class="card">
-<h3>🚀 Status</h3>
-<p>✅ API Removed</p>
-<p>✅ Groq Removed</p>
-<p>✅ 100% Working</p>
-<p>✅ Vercel Production Live</p>
+<div class="main">
+<div class="bar">
+<div style="display:flex;gap:10px;align-items:center"><span style="cursor:pointer" onclick="document.getElementById('side').classList.toggle('hide')">☰</span><div class="model">Scarlet <b>AI</b></div></div>
+<div>🎁 Free offer</div>
 </div>
-
+<div class="center" id="centerDiv">What's on your mind today?</div>
+<div class="chats" id="chatDiv"></div>
+<div class="inputArea">
+<div class="plusMenu" id="plusMenu">
+<div class="opt" onclick="openCamera()"><div class="ico">📷</div>Camera</div>
+<div class="opt" onclick="openPhotos()"><div class="ico">🖼️</div>Photos</div>
+<div class="opt" onclick="openFiles()"><div class="ico">📎</div>Files</div>
+<div class="opt" onclick="createImageUI()"><div class="ico">🎨</div>Create image</div>
+<div class="opt" onclick="openSketch()"><div class="ico">✏️</div>Sketch</div>
+<div class="opt" onclick="thinkingMode()"><div class="ico">💭</div>Thinking</div>
+<div class="opt" onclick="webSearchUI()"><div class="ico">🌐</div>Web search</div>
+<div class="opt" onclick="deepResearchUI()"><div class="ico">🔬</div>Deep research</div>
+</div>
+<div class="box">
+<div class="circle" onclick="document.getElementById('plusMenu').classList.toggle('show')">+</div>
+<input id="q" placeholder="Ask anything" onkeydown="if(event.key==='Enter')ask()">
+<div class="circle" onclick="voiceInput()">🎤</div>
+<div class="circle red" onclick="ask()">⬆</div>
+</div>
+</div>
+</div>
+<input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+<input type="file" id="fileInput" style="display:none" onchange="handleFile(this)">
+<div id="sketchBoard">
+<div class="tools"><button onclick="clearDraw()" style="padding:8px 14px;background:#222;color:#fff;border:0;border-radius:8px">Clear</button><button onclick="closeSketch()" style="padding:8px 14px;background:#ff0040;color:#fff;border:0;border-radius:8px">Save & Close</button><input type="color" id="colorPick" value="#ff0040"><input type="range" id="sizePick" min="1" max="20" value="4"></div>
+<canvas id="drawCanvas"></canvas>
+</div>
 <script>
-function send(){
-let m=document.getElementById('msg').value;
-if(!m) return;
-let c=document.getElementById('chat');
-c.innerHTML+=`<div style="margin:8px 0;color:#0f8"><b>You:</b> ${m}</div>`;
-c.innerHTML+=`<div style="margin:8px 0"><b>Scarlet:</b> Semma da! "${m}" - Scarlet AI ippo NO-AI super fast mode la irukku da! 🔥</div>`;
-document.getElementById('msg').value='';
-c.scrollTop=c.scrollHeight;
-}
+let chat=document.getElementById('chatDiv'),center=document.getElementById('centerDiv'),q=document.getElementById('q');
+function showChat(){center.style.display='none';chat.style.display='block'}
+function addMsg(role,html){showChat();let d=document.createElement('div');d.className='m '+(role==='user'?'u':'');d.innerHTML=html;chat.appendChild(d);chat.scrollTop=chat.scrollHeight}
+function ask(){let v=q.value.trim();if(!v)return;addMsg('user',v);q.value='';setTimeout(()=>addMsg('ai',v),500)}
+function newChat(){chat.innerHTML='';chat.style.display='none';center.style.display='flex'}
+function showTab(t){addMsg('ai',t)}
+async function openCamera(){document.getElementById('plusMenu').classList.remove('show');try{let s=await navigator.mediaDevices.getUserMedia({video:true});let vid=document.createElement('video');vid.autoplay=true;vid.srcObject=s;let w=document.createElement('div');w.className='m';let b=document.createElement('button');b.textContent='Capture';b.style.cssText='padding:10px 20px;background:#ff0040;color:#fff;border:0;border-radius:20px;margin-top:10px;cursor:pointer';w.appendChild(vid);w.appendChild(b);chat.appendChild(w);showChat();b.onclick=()=>{let c=document.createElement('canvas');c.width=vid.videoWidth;c.height=vid.videoHeight;c.getContext('2d').drawImage(vid,0,0);let img=c.toDataURL();s.getTracks().forEach(t=>t.stop());w.remove();addMsg('user','<img src="'+img+'">')};}catch(e){addMsg('ai','Camera permission needed')}}
+function openPhotos(){document.getElementById('photoInput').click()}
+function handlePhoto(i){if(i.files[0]){let r=new FileReader();r.onload=e=>addMsg('user','<img src="'+e.target.result+'"><br>'+i.files[0].name);r.readAsDataURL(i.files[0])}}
+function openFiles(){document.getElementById('fileInput').click()}
+function handleFile(i){if(!i.files[0])return;let f=i.files[0];let r=new FileReader();r.onload=e=>{addMsg('user','📎 '+f.name+'<br><pre style="white-space:pre-wrap;background:#000;padding:8px;border-radius:8px;margin-top:8px">'+e.target.result.slice(0,1000)+'</pre>')};if(f.type.startsWith('text')||f.name.endsWith('.json')||f.name.endsWith('.html'))r.readAsText(f);else r.readAsDataURL(f)}
+function createImageUI(){document.getElementById('plusMenu').classList.remove('show');let p=prompt('Prompt:');if(!p)return;let c=document.createElement('canvas');c.width=512;c.height=512;let ctx=c.getContext('2d');let g=ctx.createLinearGradient(0,0,512,512);g.addColorStop(0,'#ff0040');g.addColorStop(1,'#ff8800');ctx.fillStyle=g;ctx.fillRect(0,0,512,512);ctx.fillStyle='#fff';ctx.font='bold 28px sans-serif';ctx.textAlign='center';ctx.fillText('SCARLET AI',256,220);ctx.font='18px sans-serif';let words=p.split(' '),line='',y=260;for(let n=0;n<words.length;n++){let t=line+words[n]+' ';if(ctx.measureText(t).width>400&&n>0){ctx.fillText(line,256,y);line=words[n]+' ';y+=26}else line=t}ctx.fillText(line,256,y);addMsg('user','<img src="'+c.toDataURL()+'"><br>'+p)}
+let drawing=false,canvas,ctx;
+function openSketch(){document.getElementById('sketchBoard').style.display='flex';canvas=document.getElementById('drawCanvas');ctx=canvas.getContext('2d');canvas.width=innerWidth;canvas.height=innerHeight-50;ctx.lineCap='round';canvas.onpointerdown=e=>{drawing=true;ctx.beginPath();ctx.moveTo(e.clientX,e.clientY-canvas.getBoundingClientRect().top)};canvas.onpointermove=e=>{if(!drawing)return;ctx.strokeStyle=document.getElementById('colorPick').value;ctx.lineWidth=document.getElementById('sizePick').value;ctx.lineTo(e.clientX,e.clientY-canvas.getBoundingClientRect().top);ctx.stroke()};canvas.onpointerup=()=>drawing=false}
+function clearDraw(){ctx.clearRect(0,0,canvas.width,canvas.height)}
+function closeSketch(){let img=canvas.toDataURL();document.getElementById('sketchBoard').style.display='none';addMsg('user','<img src="'+img+'">')}
+function thinkingMode(){addMsg('ai','💭 Thinking...');setTimeout(()=>addMsg('ai','Done'),1200)}
+async function webSearchUI(){let query=prompt('Search:');if(!query)return;addMsg('user','Search: '+query);try{let r=await fetch('https://api.duckduckgo.com/?q='+encodeURIComponent(query)+'&format=json');let d=await r.json();addMsg('ai',d.AbstractText||'Result: '+query+' <a href="https://duckduckgo.com/?q='+encodeURIComponent(query)+'" target="_blank" style="color:#ff0040">Open</a>')}catch(e){addMsg('ai','<a href="https://www.google.com/search?q='+encodeURIComponent(query)+'" target="_blank" style="color:#ff0040">Search '+query+'</a>')}}
+function deepResearchUI(){let q=prompt('Topic:');if(!q)return;addMsg('user','Research: '+q);['Collecting','Analyzing','Checking','Report'].forEach((s,i)=>setTimeout(()=>addMsg('ai',s+' '+q), (i+1)*800))}
+function voiceInput(){let Rec=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Rec){addMsg('ai','Voice not supported');return}let r=new Rec();r.lang='en-IN';r.start();r.onresult=e=>{q.value=e.results[0][0].transcript}}
 </script>
 </body>
 </html>
