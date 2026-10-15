@@ -9,7 +9,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#fff;font-family:system-ui}
-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a;z-index:10}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px}
 .logo-img{width:40px;height:40px;border-radius:50%;border:2px solid #ff0040}
 .login-btn{background:#fff;color:#000;border:0;padding:8px 18px;border-radius:20px;font-weight:800;cursor:pointer}
@@ -33,60 +33,63 @@ textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;
 <div class="main">
 <div class="card">
 <h3>✨ Create Image</h3>
-<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city..."></textarea>
+<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city, ultra detailed..."></textarea>
 <button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
 <div id="result"></div>
 </div>
 </div>
 <script>
+// YOUR CORRECT CONFIG - FROM YOUR SCREENSHOT
 const firebaseConfig = {
-  apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE",
+  apiKey: "AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",
   authDomain: "scarlet-ai-fa68c.firebaseapp.com",
-  projectId: "scarlet-ai-fa68c"
+  projectId: "scarlet-ai-fa68c",
+  storageBucket: "scarlet-ai-fa68c.firebasestorage.app",
+  messagingSenderId: "145131745721",
+  appId: "1:145131745721:web:dfa412973efb2f37c3c668"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// GET REDIRECT RESULT FIRST
+// Handle Redirect
 auth.getRedirectResult().then((result)=>{
   if(result && result.user){
-    alert("SUCCESS DA HARI! Welcome "+result.user.displayName+" 🔥");
+    alert("SUCCESS DA HARI! 🔥 Welcome "+result.user.displayName);
   }
 }).catch((e)=>{
-  alert("Redirect Result Error: "+e.code+"\n"+e.message);
+  alert("Redirect Error: "+e.code+"\n"+e.message);
 });
 
-// LOGIN WITH DEBUG ALERTS
+// Login - REDIRECT ONLY (No about:blank)
 document.getElementById('loginBtn').onclick = async ()=>{
   const btn = document.getElementById('loginBtn');
+  btn.innerText = "Opening Google...";
   try{
-    alert("Step 1: Firebase Ready...");
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({prompt: 'select_account'});
-    
     await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    alert("Step 2: Persistence OK - Redirecting NOW!");
-    
-    btn.innerText = "Opening Google...";
     await auth.signInWithRedirect(provider);
-    
   }catch(e){
-    alert("FIREBASE ERROR:\nCode: "+e.code+"\nMessage: "+e.message+"\n\nScreenshot eduthu anuppu da!");
+    alert("ERROR:\nCode: "+e.code+"\nMsg: "+e.message);
     btn.innerText = "Login";
   }
 };
 
-// Auth state
+// Auth State
 auth.onAuthStateChanged((user)=>{
   if(user){
     document.getElementById('loginBtn').style.display='none';
-    const u = document.getElementById('userInfo');
-    u.style.display='block';
-    u.innerHTML = `👤 ${user.displayName.split(' ')[0]} <button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:5px 12px;border-radius:12px;background:#222;color:#fff;border:1px solid #444">Logout</button>`;
+    const info = document.getElementById('userInfo');
+    info.style.display='block';
+    info.innerHTML = `👤 ${user.displayName.split(' ')[0]} <button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:5px 12px;border-radius:12px;background:#222;color:#fff;border:1px solid #444">Logout</button>`;
+  } else {
+    document.getElementById('loginBtn').style.display='block';
+    document.getElementById('userInfo').style.display='none';
+    document.getElementById('loginBtn').innerText = "Login";
   }
 });
 
-// Generate
+// Generate Logic
 function getCredits(){
   const k='img_use_'+new Date().toDateString();
   let u=parseInt(localStorage.getItem(k)||"0"); if(isNaN(u)) u=0;
@@ -100,7 +103,7 @@ document.getElementById('genBtn').onclick=()=>{
   let {u,k}=getCredits(); if(u>=6) return alert("Daily over da!");
   const b=document.getElementById('genBtn'); b.disabled=true; b.innerText="Generating... 🔥";
   const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
-  document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').innerText='Generate (1 Credit)'; " onerror="document.getElementById('genBtn').disabled=false; document.getElementById('genBtn').innerText='Generate (1 Credit)';">`;
+  document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').innerText='Generate (1 Credit)'; ">`;
   localStorage.setItem(k,String(u+1)); getCredits();
 };
 </script>
