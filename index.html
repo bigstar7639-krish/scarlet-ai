@@ -32,67 +32,48 @@ textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;
 <div class="main">
 <div class="card">
 <h3 style="margin-bottom:12px">✨ Create Image</h3>
-<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city, ultra detailed..."></textarea>
+<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city..."></textarea>
 <button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
 <div id="result"></div>
 </div>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
+import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 const firebaseConfig = { apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE", authDomain: "scarlet-ai-fa68c.firebaseapp.com", projectId: "scarlet-ai-fa68c", storageBucket: "scarlet-ai-fa68c.firebasestorage.app", messagingSenderId: "145131745721", appId: "1:145131745721:web:dfa412973efb2f37c3c668" };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' });
 
-getRedirectResult(auth).then(r=>{ if(r) location.reload(); }).catch(e=>console.log(e));
+getRedirectResult(auth).then((res)=>{
+  if(res && res.user){ console.log("Logged in"); }
+}).catch(e=>{ alert("Auth Error: "+e.message); });
 
-const loginBtn = document.getElementById('loginBtn');
-loginBtn.onclick = async () => {
-  loginBtn.innerText = "Opening...";
-  try {
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    console.log("Popup failed, trying redirect", e.code);
-    alert("Popup blocked: "+e.message+" \nTrying redirect...");
-    await signInWithRedirect(auth, provider);
-  }
+document.getElementById('loginBtn').onclick = () => {
+  signInWithRedirect(auth, provider);
 };
 
 window.logout = async () => { await signOut(auth); location.reload(); };
 
 onAuthStateChanged(auth, (user) => {
   if(user){
-    loginBtn.style.display='none';
+    const btn=document.getElementById('loginBtn');
+    btn.style.display='none';
     const i=document.getElementById('userInfo');
     i.style.display='block';
     i.innerHTML=`👤 ${user.displayName.split(' ')[0]} <button onclick="logout()" style="margin-left:8px;padding:4px 10px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;cursor:pointer;">Logout</button>`;
   }
 });
 
-function getCredits(){
-  const d=new Date().toDateString();
-  const key='img_use_'+d;
-  let used = parseInt(localStorage.getItem(key) || "0");
-  if(isNaN(used) || used>6){ used=0; localStorage.setItem(key,"0"); }
-  document.getElementById('credit').innerText = `${6-used}/6 Credits`;
-  return {used, key};
-}
+function getCredits(){ const d=new Date().toDateString(); const key='img_use_'+d; let used = parseInt(localStorage.getItem(key) || "0"); if(isNaN(used) || used>6){ used=0; localStorage.setItem(key,"0"); } document.getElementById('credit').innerText = `${6-used}/6 Credits`; return {used, key}; }
 getCredits();
-
-document.getElementById('genBtn').onclick = async () => {
-  const p=document.getElementById('prompt').value.trim();
-  if(!p) return alert("Prompt type pannu da!");
-  let {used, key} = getCredits();
-  if(used>=6) return alert("Daily 6 credits over!");
-  const btn=document.getElementById('genBtn');
-  btn.disabled=true; btn.innerText="Generating... 🔥";
+document.getElementById('genBtn').onclick = () => {
+  const p=document.getElementById('prompt').value.trim(); if(!p) return alert("Prompt type pannu da!");
+  let {used, key} = getCredits(); if(used>=6) return alert("Daily 6 over!");
+  const btn=document.getElementById('genBtn'); btn.disabled=true; btn.innerText="Generating... 🔥";
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=1024&height=1024&seed=${Math.floor(Math.random()*99999)}&nologo=true`;
   document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false; document.getElementById('genBtn').innerText='Generate (1 Credit)'">`;
-  localStorage.setItem(key, String(used+1));
-  getCredits();
+  localStorage.setItem(key, String(used+1)); getCredits();
 };
 </script>
 </body>
