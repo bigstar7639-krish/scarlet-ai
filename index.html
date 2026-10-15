@@ -3,102 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scarlet AI - Free ChatGPT Clone</title>
+<title>Scarlet AI - Free Chat + Image Gen</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;display:flex;height:100vh;overflow:hidden}
+body{background:#000;color:#fff;font-family:system-ui,sans-serif;display:flex;height:100vh;overflow:hidden}
 .side{width:285px;background:#0f0f0f;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column}
 .logo{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #222}
 .logo img{width:48px;height:48px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 12px #ff0040;object-fit:cover}
-.logo b{color:#ff0040;letter-spacing:0.5px}
+.logo b{color:#ff0040}
 .main{flex:1;display:flex;flex-direction:column;background:#080808}
 .top{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;background:#0a0a0a}
 .chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
-.msg{padding:12px 16px;border-radius:14px;max-width:86%;line-height:1.6;font-size:14px}
-.user{background:#ff0040;margin-left:auto;color:#fff}
+.msg{padding:12px 16px;border-radius:14px;max-width:88%;line-height:1.6;font-size:14px;word-break:break-word}
+.user{background:#ff0040;margin-left:auto}
 .ai{background:#1a1a1a;border:1px solid #262626;display:flex;gap:10px;align-items:flex-start}
-.ai img{width:28px;height:28px;border-radius:50%;border:1px solid #333}
-.box{padding:14px 16px;border-top:1px solid #222;display:flex;gap:10px;background:#0a0a0a}
-.box input{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px 16px;border-radius:12px;outline:none}
+.ai img{width:28px;height:28px;border-radius:50%;border:1px solid #333;flex-shrink:0}
+.box{padding:14px 16px;border-top:1px solid #222;display:flex;gap:10px;background:#0a0a0a;flex-wrap:wrap}
+.box input{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px 16px;border-radius:12px;outline:none;min-width:180px}
 .box input:focus{border-color:#ff0040}
-.box button{background:#ff0040;color:#fff;border:none;padding:13px 20px;border-radius:12px;font-weight:bold;cursor:pointer}
-#lim{background:#161616;border:1px solid #222;padding:12px;border-radius:10px;font-size:13px;line-height:1.6}
+.box button{background:#ff0040;color:#fff;border:none;padding:13px 18px;border-radius:12px;font-weight:bold;cursor:pointer}
+#lim{background:#161616;border:1px solid #222;padding:12px;border-radius:10px;font-size:13px;line-height:1.5}
 .adBtn{background:#00ff88!important;color:#000!important;border:none!important;padding:11px!important;border-radius:10px!important;font-weight:bold!important;width:100%!important;cursor:pointer;margin-top:10px}
 .progress{height:6px;background:#222;border-radius:10px;margin-top:8px;overflow:hidden}
 .progress div{height:100%;background:linear-gradient(90deg,#ff0040,#ff8a00);transition:0.3s}
+.tabBtn{flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#1a1a1a;color:#888;cursor:pointer;font-weight:bold;font-size:13px}
+.tabBtn.active{background:#ff0040;color:#fff;border-color:#ff0040}
+.genBox{width:100%;display:flex;gap:8px;margin-top:8px}
 </style>
 </head>
 <body>
 <div class="side">
 <div class="logo">
 <img src="IMG-20261015-WA4421.jpg">
-<div><b>SCARLET AI</b><br><small style="color:#777;font-size:11px">Free • No Paid</small></div>
+<div><b>SCARLET AI</b><br><small style="color:#777;font-size:11px">Free Chat • Paid Image</small></div>
+</div>
+<div style="display:flex;gap:6px;margin-bottom:12px">
+<button class="tabBtn active">Chat</button>
+<button class="tabBtn">Image</button>
 </div>
 <div id="lim">Loading...</div>
-<button class="adBtn" onclick="watchAd()">📺 Watch Ad +2 Credits</button>
+<button class="adBtn" onclick="watchAd()">📺 Watch Ad +2 Image Credits</button>
 <div style="margin-top:auto;background:#111;padding:10px;border-radius:8px;border:1px solid #222">
-<p style="color:#00ff88;font-size:12px;font-weight:bold">💰 Earning Model</p>
-<p style="color:#888;font-size:11px;margin-top:4px;line-height:1.5">Free: 6/day<br>Ad: 1 Ad = 2 Credits<br>Max: 5 Ads = 10<br>Total: 16/day FREE</p>
+<p style="color:#00ff88;font-size:12px;font-weight:bold">💰 Scarlet Model</p>
+<p style="color:#888;font-size:11px;margin-top:4px;line-height:1.6">💬 Chat: FREE Unlimited<br>🎨 Image: 6 free/day<br>📺 Ad: +2 per ad (max 5)<br>🖼️ Total: 16 images/day</p>
 </div>
 <p style="color:#444;font-size:10px;margin-top:12px;text-align:center">Scarlet AI by Hari 🔥</p>
 </div>
 <div class="main">
-<div class="top"><b>Scarlet AI Chat</b><small style="color:#666">Scarlet Model • Free</small></div>
+<div class="top"><b>Scarlet AI</b><small style="color:#666">Chat Free • Image = Credits</small></div>
 <div class="chat" id="chat"></div>
 <div class="box">
-<input id="inp" placeholder="Message Scarlet AI..." autocomplete="off">
+<input id="inp" placeholder="Chat FREE... or type 'generate image of...' (uses credits)" autocomplete="off">
 <button onclick="send()">Send 🚀</button>
+<div class="genBox">
+<input id="imgInp" placeholder="🎨 Describe image to generate (uses 1 credit)..." style="flex:1;background:#1a1a1a;border:1px solid #ff0040;color:#fff;padding:11px 14px;border-radius:10px">
+<button onclick="generateImage()" style="background:linear-gradient(90deg,#ff0040,#ff8a00)">🎨 Generate</button>
+</div>
 </div>
 </div>
 <script>
-const FREE=6, PER_AD=2, MAX_ADS=5;
+const FREE_IMG=6, PER_AD=2, MAX_ADS=5;
 function getU(){
   const d=new Date().toDateString();
-  return {used:parseInt(localStorage.getItem(`use_${d}`)||"0"),adC:parseInt(localStorage.getItem(`adC_${d}`)||"0"),adW:parseInt(localStorage.getItem(`adW_${d}`)||"0"),d,total(){return FREE+this.adC}}
+  return {used:parseInt(localStorage.getItem(`img_use_${d}`)||"0"),adC:parseInt(localStorage.getItem(`img_adC_${d}`)||"0"),adW:parseInt(localStorage.getItem(`img_adW_${d}`)||"0"),d,total(){return FREE_IMG+this.adC},left(){return this.total()-this.used}}
 }
 function update(){
-  const u=getU();const pct=Math.min(100,(u.used/u.total()*100));
-  document.getElementById('lim').innerHTML=`<div style="display:flex;justify-content:space-between"><b>${u.used}/${u.total()} Used</b><span style="color:${pct>80?'#ff4444':'#00ff88'}">${pct.toFixed(0)}%</span></div><small style="color:#888">${FREE} free + ${u.adC} ad credits • ${u.adW}/${MAX_ADS} ads</small><div class="progress"><div style="width:${pct}%"></div></div>`;
+  const u=getU();const pct=u.total()>0?Math.min(100,(u.used/u.total()*100)):0;
+  document.getElementById('lim').innerHTML=`<div style="display:flex;justify-content:space-between"><b>🖼️ ${u.used}/${u.total()} Images</b><span style="color:${pct>80?'#ff4444':'#00ff88'}">${u.left()} left</span></div><small style="color:#888">Chat FREE • ${FREE_IMG} free + ${u.adC} ad • ${u.adW}/${MAX_ADS} ads</small><div class="progress"><div style="width:${pct}%"></div></div><small style="color:#aaa;display:block;margin-top:6px">💬 Chatting = No credits needed!</small>`;
 }
-function can(){
+function canImage(){
   const u=getU();
   if(u.used>=u.total()){
-    if(u.adW>=MAX_ADS){alert(`Dei! ${u.total()}/16 over da! Naalaiku 6 free reset!`)}else{if(confirm(`🔥 Limit Over! ${u.used}/${u.total()} mudinchiduchu!\n📺 Ad paathu +2 credits vaangava?`)){watchAd()}}
+    if(u.adW>=MAX_ADS){alert(`🔒 Images over da! ${u.total()}/16 mudinchiduchu! Naalaiku reset! Chat FREE than da!`)}
+    else{if(confirm(`🎨 Image Limit Over! ${u.used}/${u.total()} images mudinchiduchu!\n📺 Ad paathu +2 image credits vaangava?\n\n💬 Chat pannalam - FREE da!`)){watchAd()}}
     return false
   }return true
 }
 function send(){
-  const i=document.getElementById('inp');const t=i.value.trim();if(!t||!can())return;
+  const i=document.getElementById('inp');const t=i.value.trim();if(!t)return;
   const c=document.getElementById('chat');const img=`IMG-20261015-WA4421.jpg`;
   c.innerHTML+=`<div class="msg user">${t.replace(/</g,"&lt;")}</div>`;i.value="";
-  const u=getU();localStorage.setItem(`use_${u.d}`,u.used+1);update();
   const id="ai_"+Date.now();
-  c.innerHTML+=`<div class="msg ai" id="${id}"><img src="${img}"><div>Thinking...</div></div>`;c.scrollTop=c.scrollHeight;
+  c.innerHTML+=`<div class="msg ai" id="${id}"><img src="${img}"><div>Typing...</div></div>`;c.scrollTop=c.scrollHeight;
   setTimeout(()=>{
-    document.getElementById(id).innerHTML=`<img src="${img}"><div><b>Scarlet:</b> Dei Hari! Un question: <i>"${t.replace(/</g,"&lt;")}"</i><br><br>🔥 Naan Scarlet AI da! Ithu demo answer! OpenAI API add panna real answer varum! Ippo ${u.total()-u.used-1} credits left da!</div>`;
+    let reply=`<b>Scarlet:</b> Dei Hari! "${t.replace(/</g,"&lt;")}" super question da! 🔥<br><br>💬 Chat FREE da - En kita ethu venalum kelu - Unlimited!`;
+    if(t.toLowerCase().includes("image")||t.toLowerCase().includes("photo")||t.toLowerCase().includes("generate")){
+      reply+=`<br><br>🎨 Image venumna - Keeza irukura <b>Generate box</b> la type pannu - Athu 1 credit use aagum. Chat ku credit illa da!`;
+    }
+    document.getElementById(id).innerHTML=`<img src="${img}"><div>${reply}</div>`;
     c.scrollTop=c.scrollHeight;
-  },800);
+  },700);
+}
+function generateImage(){
+  const i=document.getElementById('imgInp');const prompt=i.value.trim();if(!prompt){alert("Describe pannu da! Eg: girl with red dress");return}
+  if(!canImage())return;
+  const u=getU();localStorage.setItem(`img_use_${u.d}`,u.used+1);update();
+  const c=document.getElementById('chat');
+  c.innerHTML+=`<div class="msg user">🎨 Generate: ${prompt.replace(/</g,"&lt;")}</div>`;
+  const id="img_"+Date.now();
+  c.innerHTML+=`<div class="msg ai" id="${id}"><img src="${u.left()>0?`IMG-20261015-WA4421.jpg`:`IMG-20261015-WA4421.jpg`}"><div>🎨 Generating "${prompt.replace(/</g,"&lt;")}"...<br><small style="color:#888">1 credit used • ${u.left()-1} left</small></div></div>`;
+  c.scrollTop=c.scrollHeight;i.value="";
+  setTimeout(()=>{
+    // Demo image - later connect to real AI API
+    document.getElementById(id).innerHTML=`<img src="IMG-20261015-WA4421.jpg"><div><b>Scarlet Image Gen:</b><br>"${prompt.replace(/</g,"&lt;")}"<br><br><div style="height:180px;background:linear-gradient(135deg,#ff0040,#1a1a1a);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;margin-top:8px"><span style="font-size:40px">🖼️</span><small style="margin-top:8px">Demo Image<br>Connect Stability API for real image</small></div><small style="color:#00ff88;margin-top:6px;display:block">✅ 1 credit used • ${u.left()-1} left • Chat FREE!</small></div>`;
+    c.scrollTop=c.scrollHeight;
+  },1200);
 }
 function watchAd(){
   const u=getU();if(u.adW>=MAX_ADS){alert("Today 5 ads over da! Max 10 credits!");return}
   const b=document.createElement('div');b.id="adBox";
   b.style="position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px";
   b.innerHTML=`<div style="background:#1e1e1e;max-width:360px;width:100%;border-radius:18px;overflow:hidden;border:1px solid #333">
-  <div style="padding:12px 14px;background:#2a2a2a;display:flex;justify-content:space-between"><small style="color:#fff;font-weight:bold">📺 Watch Ad - Earn +2</small><small id="tm" style="color:#00ff88;background:#000;padding:4px 8px;border-radius:6px">15s</small></div>
+  <div style="padding:12px 14px;background:#2a2a2a;display:flex;justify-content:space-between"><small style="color:#fff;font-weight:bold">📺 Ad = +2 Image Credits</small><small id="tm" style="color:#00ff88;background:#000;padding:4px 8px;border-radius:6px">15s</small></div>
   <div style="height:260px;background:linear-gradient(135deg,#ff0040 0%,#000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff">
-  <div style="font-size:40px">📺</div><b style="font-size:16px;margin-top:8px">GOOGLE ADSENSE AD</b><p style="font-size:13px;margin-top:8px;color:#ddd">Un AdSense code inga varum da!<br>15 sec full paaru = +2 Credits!</p><small style="margin-top:12px;background:rgba(255,255,255,0.1);padding:6px 10px;border-radius:20px;font-size:11px">1 Ad = 2 Credits • 5 Ads = 10/day</small></div>
+  <div style="font-size:40px">📺</div><b style="font-size:16px;margin-top:8px">YOUR ADSENSE AD HERE</b><p style="font-size:13px;margin-top:8px;color:#ddd">15 sec paaru = +2 Image Credits!<br>Chat ku credit thevai illa da!</p><small style="margin-top:12px;background:rgba(255,255,255,0.1);padding:6px 10px;border-radius:20px;font-size:11px">Chat FREE • Image = Credits</small></div>
   <div style="padding:16px"><button id="clm" disabled style="width:100%;padding:13px;background:#444;color:#aaa;border:none;border-radius:10px;font-weight:bold">Wait 15s...</button><button onclick="document.getElementById('adBox').remove()" style="width:100%;margin-top:10px;background:transparent;color:#666;border:none;font-size:13px">Skip (No credits)</button></div></div>`;
   document.body.appendChild(b);let tt=15;
   const iv=setInterval(()=>{
     tt--;const el=document.getElementById('tm');const btn=document.getElementById('clm');if(!el||!btn){clearInterval(iv);return}
     el.innerText=tt+"s";btn.innerText=`Wait ${tt}s...`;
-    if(tt<=0){clearInterval(iv);btn.disabled=false;btn.style.background="#00ff88";btn.style.color="#000";btn.style.cursor="pointer";btn.innerText="✅ Claim +2 Credits!";
-    btn.onclick=()=>{localStorage.setItem(`adC_${u.d}`,u.adC+2);localStorage.setItem(`adW_${u.d}`,u.adW+1);document.getElementById('adBox').remove();alert(`🔥 +2 Credits Added Da!\nTotal: ${u.total()+2} • Used: ${u.used}/${u.total()+2}`);update()}}
+    if(tt<=0){clearInterval(iv);btn.disabled=false;btn.style.background="#00ff88";btn.style.color="#000";btn.style.cursor="pointer";btn.innerText="✅ Claim +2 Image Credits!";
+    btn.onclick=()=>{localStorage.setItem(`img_adC_${u.d}`,u.adC+2);localStorage.setItem(`img_adW_${u.d}`,u.adW+1);document.getElementById('adBox').remove();alert(`🔥 +2 Image Credits Added!\nTotal Images: ${u.total()+2} • Left: ${u.left()+2}`);update()}}
   },1000);
 }
 update();
-document.getElementById('chat').innerHTML=`<div class="msg ai"><img src="IMG-20261015-WA4421.jpg"><div>Vanakkam da Hari! 🔥<br><br><b>Scarlet AI Ready!</b><br>• 6 Free chats / day<br>• 📺 Watch Ad = +2 credits<br>• Max 5 ads = 10 extra<br>• Total 16/day - No Paid!<br><br>Type pannu da - Let's go! 🚀</div></div>`;
+document.getElementById('chat').innerHTML=`<div class="msg ai"><img src="IMG-20261015-WA4421.jpg"><div>Vanakkam da Hari! 🔥<br><br><b>NEW MODEL:</b><br>💬 <b>Chat = FREE Unlimited ♾️</b><br>🎨 <b>Image Gen = 6 free/day + Ad</b><br><br>Chat ku credit illa da! Photo edit / Image generate panna mattum credit!<br><br>Type pannu da - Let's go! 🚀</div></div>`;
 document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
+document.getElementById('imgInp').addEventListener('keydown',e=>{if(e.key==='Enter')generateImage()});
 </script>
 </body>
 </html>
