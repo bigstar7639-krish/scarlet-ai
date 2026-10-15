@@ -3,60 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scarlet AI</title>
+<title>Scarlet AI - Final</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#fff;font-family:system-ui}header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a} .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px} .logo-img{width:42px;height:42px;border-radius:50%;border:2px solid #ff0040} .credit{font-size:12px;color:#aaa;border:1px solid #333;padding:6px 12px;border-radius:20px} .login-btn{background:#fff;color:#000;border:0;padding:8px 18px;border-radius:20px;font-weight:700;cursor:pointer} .main{max-width:700px;margin:0 auto;padding:20px} .card{background:#141414;border:1px solid #222;border-radius:16px;padding:20px;margin-top:20px} textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:14px;color:#fff;resize:none} .gen-btn{width:100%;margin-top:16px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:14px;border-radius:12px;color:#fff;font-weight:700;font-size:16px;cursor:pointer} #result img{width:100%;border-radius:12px;margin-top:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:system-ui}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a;z-index:10}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800}
+.logo-img{width:38px;height:38px;border-radius:50%;border:2px solid #ff0040}
+.login-btn{background:#fff;color:#000;border:0;padding:7px 16px;border-radius:20px;font-weight:700;cursor:pointer}
+.main{max-width:700px;margin:0 auto;padding:16px}
+.card{background:#141414;border:1px solid #222;border-radius:16px;padding:18px;margin-top:16px}
+textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;outline:none}
+.gen-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:14px;border-radius:12px;color:#fff;font-weight:700;cursor:pointer}
+#result img{width:100%;border-radius:12px;margin-top:12px}
+.credit{font-size:12px;color:#aaa;border:1px solid #333;padding:5px 10px;border-radius:20px}
 </style>
 </head>
 <body>
 <header>
 <div class="logo"><img src="logo.png" class="logo-img"> Scarlet AI</div>
 <div style="display:flex;gap:10px;align-items:center">
-<div class="credit" id="credit">6/6 Credits</div>
-<button class="login-btn" id="loginBtn" onclick="loginNow()">Login</button>
+<div class="credit" id="credit">6/6</div>
+<button class="login-btn" id="loginBtn">Login</button>
 <span id="userInfo" style="display:none"></span>
 </div>
 </header>
 <div class="main">
 <div class="card">
 <h3>✨ Create Image</h3>
-<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city..."></textarea>
+<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city, ultra detailed..."></textarea>
 <button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
 <div id="result"></div>
 </div>
 </div>
+
 <script>
-const firebaseConfig = { apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE", authDomain: "scarlet-ai-fa68c.firebaseapp.com", projectId: "scarlet-ai-fa68c" };
+const firebaseConfig = {
+  apiKey: "AIzaSyAJagbPj--jTLcYeTE-PDOWc9tuhXCl6PdE",
+  authDomain: "scarlet-ai-fa68c.firebaseapp.com",
+  projectId: "scarlet-ai-fa68c"
+};
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const provider = new firebase.auth.GoogleAuthProvider();
 
-function loginNow(){
-  document.getElementById('loginBtn').innerText = "Redirecting...";
-  auth.signInWithRedirect(provider);
-}
+// LOGIN - FINAL FIX WITH POPUP
+document.getElementById('loginBtn').onclick = function(){
+  const btn = document.getElementById('loginBtn');
+  btn.innerText = "Opening Google...";
+  const provider = new firebase.auth.GoogleAuthProvider();
+  // Force account selection
+  provider.setCustomParameters({prompt: 'select_account'});
+  
+  auth.signInWithPopup(provider)
+    .then((result)=>{
+      alert("Login Success: " + result.user.displayName + " 🔥");
+      location.reload();
+    })
+    .catch((error)=>{
+      console.log(error);
+      // If popup blocked, try redirect
+      if(error.code === 'auth/popup-blocked'){
+        alert("Popup blocked, redirecting...");
+        auth.signInWithRedirect(provider);
+      } else if(error.code === 'auth/popup-closed-by-user'){
+        btn.innerText = "Login";
+      } else {
+        alert("LOGIN ERROR:\nCode: "+error.code+"\nMessage: "+error.message);
+        btn.innerText = "Login";
+      }
+    });
+};
 
-auth.getRedirectResult().then(r=>{ if(r.user) console.log("Logged in"); }).catch(e=>alert("Login Error: "+e.message));
+// Handle Redirect result
+auth.getRedirectResult().then((result)=>{
+  if(result && result.user){
+    console.log("Redirect success", result.user.displayName);
+  }
+}).catch((e)=>{
+  alert("Redirect Error: "+e.message);
+});
 
-auth.onAuthStateChanged(user=>{
+// Auth state
+auth.onAuthStateChanged((user)=>{
   if(user){
     document.getElementById('loginBtn').style.display='none';
-    const u=document.getElementById('userInfo');
+    const u = document.getElementById('userInfo');
     u.style.display='block';
-    u.innerHTML=`👤 ${user.displayName} <button onclick="auth.signOut().then(()=>location.reload())" style="margin-left:8px;padding:4px 10px;border-radius:10px;background:#222;color:#fff;border:1px solid #333">Logout</button>`;
+    u.innerHTML = `👤 ${user.displayName.split(' ')[0]} <button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:4px 10px;border-radius:10px;background:#222;color:#fff;border:1px solid #444">Logout</button>`;
   }
 });
 
-function getCredits(){ const k='img_use_'+new Date().toDateString(); let u=parseInt(localStorage.getItem(k)||"0"); if(isNaN(u)||u>6){u=0;localStorage.setItem(k,"0");} document.getElementById('credit').innerText=`${6-u}/6 Credits`; return {u,k}; } getCredits();
+// Credits
+function getCredits(){
+  const k='img_use_'+new Date().toDateString();
+  let u=parseInt(localStorage.getItem(k)||"0");
+  if(isNaN(u)) u=0;
+  document.getElementById('credit').innerText=`${6-u}/6`;
+  return {u,k};
+}
+getCredits();
+
 document.getElementById('genBtn').onclick=()=>{
-  const p=document.getElementById('prompt').value.trim(); if(!p) return alert("Prompt type pannu da!");
-  let {u,k}=getCredits(); if(u>=6) return alert("Daily over!");
-  const b=document.getElementById('genBtn'); b.disabled=true; b.innerText="Generating... 🔥";
-  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true`;
-  document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').innerText='Generate (1 Credit)'">`;
-  localStorage.setItem(k,String(u+1)); getCredits();
+  const p=document.getElementById('prompt').value.trim();
+  if(!p) return alert("Prompt type pannu da!");
+  let {u,k}=getCredits();
+  if(u>=6) return alert("Daily limit over da!");
+  const b=document.getElementById('genBtn');
+  b.disabled=true; b.innerText="Generating... 🔥";
+  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
+  document.getElementById('result').innerHTML=`<img src="${url}" onload="document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').innerText='Generate (1 Credit)'; getCredits();" onerror="alert('Image fail, try again'); document.getElementById('genBtn').disabled=false; document.getElementById('genBtn').innerText='Generate (1 Credit)';">`;
+  localStorage.setItem(k,String(u+1));
+  getCredits();
 };
 </script>
 </body>
