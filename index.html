@@ -3,44 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scarlet AI</title>
+<title>Scarlet AI - Chat & Image</title>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#fff;font-family:system-ui}
-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a;z-index:10}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px}
-.logo-img{width:40px;height:40px;border-radius:50%;border:2px solid #ff0040}
-.login-btn{background:#fff;color:#000;border:0;padding:8px 18px;border-radius:20px;font-weight:800;cursor:pointer}
-.credit{font-size:12px;color:#aaa;border:1px solid #333;padding:5px 10px;border-radius:20px}
-.main{max-width:700px;margin:0 auto;padding:16px}
-.card{background:#141414;border:1px solid #222;border-radius:16px;padding:18px;margin-top:18px}
-textarea{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;outline:none;resize:none;font-size:15px}
-.gen-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:14px;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;font-size:16px}
-#result img{width:100%;border-radius:12px;margin-top:14px}
-#g_id_onload{position:fixed;top:70px;right:10px;z-index:100}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a;z-index:10}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px}
+.logo-img{width:38px;height:38px;border-radius:50%;border:2px solid #ff0040;object-fit:cover}
+.login-btn{background:#fff;color:#000;border:0;padding:8px 16px;border-radius:20px;font-weight:800;cursor:pointer}
+.credit{font-size:11px;color:#aaa;border:1px solid #333;padding:4px 8px;border-radius:20px}
+.user-box{display:flex;align-items:center;gap:8px}
+.user-avatar{width:32px;height:32px;border-radius:50%;border:2px solid #ff0040;object-fit:cover;background:#222}
+.tabs{display:flex;gap:10px;max-width:700px;margin:14px auto 0;padding:0 16px}
+.tab{flex:1;padding:10px;border-radius:12px;border:1px solid #333;background:#151515;color:#aaa;font-weight:700;cursor:pointer;text-align:center;transition:0.2s}
+.tab.active{background:#fff;color:#000;border-color:#fff}
+.main{max-width:700px;margin:0 auto;padding:12px 16px 100px}
+.card{background:#141414;border:1px solid #222;border-radius:16px;padding:14px;margin-top:12px}
+textarea,input{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;outline:none;resize:none;font-size:14px}
+.gen-btn{width:100%;margin-top:10px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:13px;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;font-size:15px}
+#result img{width:100%;border-radius:12px;margin-top:12px}
+.chat-msg{padding:10px 12px;border-radius:12px;margin:8px 0;max-width:90%;line-height:1.4;font-size:14px;word-break:break-word}
+.user-msg{background:#ff0040;margin-left:auto}
+.ai-msg{background:#1e1e1e;border:1px solid #333}
+#chatBox{max-height:60vh;overflow-y:auto;display:flex;flex-direction:column}
+.dl-btn{margin-top:8px;background:#fff;color:#000;border:0;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer;width:100%}
 </style>
 </head>
 <body>
 <header>
-<div class="logo"><img src="logo.png" onerror="this.style.display='none'" class="logo-img"> Scarlet AI</div>
-<div style="display:flex;gap:10px;align-items:center">
+<div class="logo"><img src="logo.png" onerror="this.src='https://i.imgur.com/8QJ4sQv.png'" class="logo-img"> Scarlet AI</div>
+<div style="display:flex;gap:8px;align-items:center">
 <div class="credit" id="credit">6/6</div>
 <button class="login-btn" id="loginBtn">Login</button>
-<span id="userInfo" style="display:none"></span>
+<div id="userInfo" class="user-box" style="display:none"></div>
 </div>
 </header>
-<div id="g_id_onload"></div>
+
+<div class="tabs">
+<div class="tab active" id="tabChat" onclick="switchTab('chat')">💬 ChatGPT</div>
+<div class="tab" id="tabImg" onclick="switchTab('img')">🎨 Image</div>
+</div>
+
 <div class="main">
-<div class="card">
+<div id="chatTab" class="card">
+<div id="chatBox"><div class="chat-msg ai-msg">Hi da Moco! Naan Scarlet AI da! Enna pannalam? 😎</div></div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<input id="chatInput" placeholder="Ask anything...">
+<button class="gen-btn" style="width:80px;margin-top:0" id="chatSend">Send</button>
+</div>
+</div>
+
+<div id="imgTab" class="card" style="display:none">
 <h3>✨ Create Image</h3>
-<textarea id="prompt" rows="4" placeholder="A cyberpunk girl in neon city, ultra detailed..."></textarea>
+<textarea id="prompt" rows="3" placeholder="Scarlet Vandimion anime character, ultra detailed..."></textarea>
 <button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
 <div id="result"></div>
 </div>
 </div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",
@@ -52,66 +75,43 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-
 const loginBtn = document.getElementById('loginBtn');
 const userInfo = document.getElementById('userInfo');
 const GOOGLE_CLIENT_ID = "145131745721-gu1u800lif4elinkbb09s06aktel90fr.apps.googleusercontent.com";
 
-function handleCredentialResponse(response){
-  const idToken = response.credential;
-  const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-  loginBtn.innerText = "Logging in...";
-  auth.signInWithCredential(credential).then((result)=>{
-    console.log("SUCCESS HARI!", result.user.email);
-  }).catch((e)=>{
-    alert("Login failed: "+e.message);
-    loginBtn.innerText = "Login";
-    console.error(e);
-  });
+function handleCredentialResponse(r){
+  const credential = firebase.auth.GoogleAuthProvider.credential(r.credential);
+  loginBtn.innerText="Logging...";
+  auth.signInWithCredential(credential).catch(e=>{alert(e.message); loginBtn.innerText="Login";});
 }
-
 function initGSI(){
-  if(!window.google || !window.google.accounts) {
-    setTimeout(initGSI, 300);
-    return;
-  }
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleCredentialResponse,
-    auto_select: false,
-    cancel_on_tap_outside: false
-  });
-  // Pre-load One Tap
-  google.accounts.id.prompt();
+  if(!window.google || !google.accounts){ setTimeout(initGSI,500); return; }
+  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse,auto_select:false});
 }
-
-window.addEventListener('load', initGSI);
-
-loginBtn.onclick = ()=>{
-  if(!window.google || !window.google.accounts){
-    alert("Google loading da... 2 sec aprom click pannu");
-    return;
-  }
-  google.accounts.id.prompt((notification)=>{
-    console.log("Prompt status", notification);
-    if(notification.isNotDisplayed()){
-      alert("Popup blocked da! Chrome la 'Allow popups' pannu, aprom refresh panni try pannu da!");
-    }
-  });
-};
+initGSI();
+loginBtn.onclick=()=>{ if(!window.google) return alert("Wait 2 sec da"); google.accounts.id.prompt(); };
 
 auth.onAuthStateChanged((user)=>{
   if(user){
+    console.log("USER:", user.displayName, user.photoURL, user.email);
     loginBtn.style.display='none';
     userInfo.style.display='flex';
-    userInfo.style.alignItems='center';
-    userInfo.innerHTML = `<span>👤 ${user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : 'User')}</span><button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:8px;padding:5px 12px;border-radius:12px;background:#222;color:#fff;border:1px solid #444;cursor:pointer">Logout</button>`;
+    const photo = user.photoURL ? user.photoURL : `https://ui-avatars.com/api/?name=Moco&background=ff0040&color=fff&bold=true`;
+    const name = user.displayName || "Mσcσ";
+    userInfo.innerHTML = `<img src="${photo}" class="user-avatar" referrerpolicy="no-referrer"><span style="font-size:13px;font-weight:800;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span><button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:4px;padding:5px 10px;border-radius:12px;background:#222;color:#fff;border:1px solid #444;cursor:pointer;font-size:11px">Logout</button>`;
   }else{
     loginBtn.style.display='block';
     userInfo.style.display='none';
     loginBtn.innerText="Login";
   }
 });
+
+function switchTab(t){
+  document.getElementById('tabChat').classList.toggle('active', t==='chat');
+  document.getElementById('tabImg').classList.toggle('active', t==='img');
+  document.getElementById('chatTab').style.display = t==='chat' ? 'block' : 'none';
+  document.getElementById('imgTab').style.display = t==='img' ? 'block' : 'none';
+}
 
 function getCredits(){
   const k='img_use_'+new Date().toDateString();
@@ -120,17 +120,46 @@ function getCredits(){
   return {u,k};
 }
 getCredits();
+
 document.getElementById('genBtn').onclick=()=>{
   const p=document.getElementById('prompt').value.trim();
   if(!p) return alert("Prompt type pannu da!");
-  let {u,k}=getCredits(); if(u>=6) return alert("Daily 6 over da! Tomorrow va!");
+  let {u,k}=getCredits(); if(u>=6) return alert("Daily 6 over da!");
   const b=document.getElementById('genBtn'); b.disabled=true; b.innerText="Generating... 🔥";
   const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
   const r=document.getElementById('result');
-  const img=new Image(); img.src=url;
-  img.onload=()=>{ r.innerHTML=''; r.appendChild(img); b.disabled=false; b.innerText='Generate (1 Credit)'; localStorage.setItem(k,String(u+1)); getCredits(); };
-  img.onerror=()=>{ b.disabled=false; b.innerText='Generate (1 Credit)'; alert("Failed, try again da"); };
+  const img=new Image(); img.crossOrigin="anonymous"; img.src=url;
+  img.onload=()=>{
+    r.innerHTML=''; 
+    r.appendChild(img);
+    const dl=document.createElement('button'); dl.className='dl-btn'; dl.innerText='⬇️ Download';
+    dl.onclick=()=>{ const a=document.createElement('a'); a.href=img.src; a.download='scarlet-'+Date.now()+'.png'; a.click(); };
+    r.appendChild(dl);
+    b.disabled=false; b.innerText='Generate (1 Credit)'; localStorage.setItem(k,String(u+1)); getCredits();
+  };
+  img.onerror=()=>{ b.disabled=false; b.innerText='Generate (1 Credit)'; alert("Failed da"); };
 };
+
+const chatBox=document.getElementById('chatBox');
+const chatInput=document.getElementById('chatInput');
+async function sendChat(){
+  const q=chatInput.value.trim(); if(!q) return;
+  chatBox.innerHTML+=`<div class="chat-msg user-msg">${q}</div>`;
+  chatInput.value=''; chatBox.scrollTop=chatBox.scrollHeight;
+  const loadingId='load_'+Date.now();
+  chatBox.innerHTML+=`<div class="chat-msg ai-msg" id="${loadingId}">Typing... ✨</div>`;
+  chatBox.scrollTop=chatBox.scrollHeight;
+  try{
+    const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?model=openai`);
+    const text=await res.text();
+    document.getElementById(loadingId).innerText=text;
+  }catch(e){
+    document.getElementById(loadingId).innerText="Error da Moco, network check pannu!";
+  }
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+document.getElementById('chatSend').onclick=sendChat;
+chatInput.addEventListener('keypress',(e)=>{ if(e.key==='Enter') sendChat(); });
 </script>
 </body>
 </html>
