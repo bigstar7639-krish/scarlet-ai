@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Scarlet AI</title>
 <link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://text.pollinations.ai">
+<link rel="preconnect" href="https://image.pollinations.ai">
+<link rel="dns-prefetch" href="https://api.pollinations.ai">
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://accounts.google.com/gsi/client"></script>
@@ -56,11 +59,10 @@ body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;h
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90}
 .overlay.show{display:block}
 @media(max-width:900px){
-.sidebar{position:fixed;left:0;top:0;height:100%;height:100dvh;z-index:100;transform:translateX(-100%);transition:transform .25s ease;width:280px}
+.sidebar{position:fixed;left:0;top:0;height:100%;height:100dvh;z-index:100;transform:translateX(-100%);transition:transform.25s ease;width:280px}
 .sidebar.open{transform:translateX(0)}
 .hamburger{display:block}
 .top-center{font-size:13px}
-.chat-work{display:none}
 .input-area{padding:8px 10px 10px}
 .tools{width:94vw;left:50%;transform:translateX(-50%);bottom:62px}
 }
@@ -69,7 +71,7 @@ body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;h
 <body>
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
-<div class="sb-logo"><img src="logo.png"> Scarlet AI <span style="margin-left:auto;font-size:10px;background:#222;padding:3px 6px;border-radius:6px">v1.5</span></div>
+<div class="sb-logo"><img src="logo.png"> Scarlet AI <span style="margin-left:auto;font-size:10px;background:#222;padding:3px 6px;border-radius:6px">v2.0</span></div>
 <div class="sb-item active" onclick="newChat()">✎ New chat</div>
 <div class="sb-item">🖼️ Images</div>
 <div class="sb-item">🕒 Scheduled</div>
@@ -102,7 +104,7 @@ body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;h
 <div class="input-area">
 <div class="input-box" id="inputBox">
 <div class="plus" id="plusBtn">+</div>
-<textarea class="inp" id="inp" placeholder="Ask anything" rows="1"></textarea>
+<textarea class="inp" id="inp" placeholder="Ask anything - Tamil, Hindi, English..." rows="1"></textarea>
 <button class="send" id="sendBtn">↑</button>
 <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none">
 <div class="tools" id="tools">
@@ -145,7 +147,7 @@ function saveChats(){localStorage.setItem(getChatKey(),JSON.stringify(chats));re
 function renderHistory(){historyEl.innerHTML='';chats.slice().reverse().forEach(c=>{const d=document.createElement('div');d.className='sb-recent';d.innerText=c.title;historyEl.appendChild(d);});}
 function loadChats(){try{chats=JSON.parse(localStorage.getItem(getChatKey())||'[]');}catch{chats=[]}renderHistory();newChat();}
 function getCredits(){const k=getCreditKey();let u=parseInt(localStorage.getItem(k)||'0');if(isNaN(u))u=0;document.getElementById('credit').innerText=`${6-u}/6`;return {u,k};}
-function setMode(m){mode=m;tools.classList.remove('show');addMsg('ai',(m==='image'?'Image mode ON da Moco! 🎨':m+' mode ON'));inp.focus();}
+function setMode(m){mode=m;tools.classList.remove('show');addMsg('ai',(m==='image'?'Image mode ON da Moco! 🎨 Describe pannu':'' +m+' mode ON'));inp.focus();}
 
 const firebaseConfig={apiKey:"AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",authDomain:"scarlet-ai-fa68c.firebaseapp.com",projectId:"scarlet-ai-fa68c",storageBucket:"scarlet-ai-fa68c.firebasestorage.app",messagingSenderId:"145131745721",appId:"1:145131745721:web:dfa412973efb2f37c3c668"};
 firebase.initializeApp(firebaseConfig);
@@ -158,7 +160,6 @@ document.getElementById('loginBtn').onclick=async()=>{
     provider.setCustomParameters({prompt:'select_account'});
     await auth.signInWithPopup(provider);
   }catch(e){
-    console.log(e);
     document.getElementById('loginBtn').innerText='Log in';
     alert('Login error: '+e.message);
   }
@@ -212,19 +213,48 @@ fileInput.onchange=e=>{
  const f=e.target.files[0];if(!f) return;
  const r=new FileReader();r.onload=ev=>{addMsg('user',`File: ${f.name}`,ev.target.result);addMsg('ai',`Got "${f.name}" da!`);};r.readAsDataURL(f);
 };
+
+// FAST REPLY + ALL LANGUAGES
 async function send(){
  const q=inp.value.trim();if(!q) return;
  addMsg('user',q);inp.value='';inp.style.height='auto';tools.classList.remove('show');
- const isImg=mode==='image'||q.toLowerCase().includes('create image');
- const prompt=q.replace('create image','').trim()||q;
+ const isImg=mode==='image'||/create image|generate image|படம்|चित्र|ছবি|చిత్రం/i.test(q);
+ const prompt=q.replace(/create image|generate image/gi,'').trim()||q;
+
  if(isImg){
-  let {u,k}=getCredits();if(u>=6){addMsg('ai','Daily 6 over da Moco!');return;}
+  let {u,k}=getCredits();if(u>=6){addMsg('ai','Daily limit over da Moco! 6/6 mudinjuthu ❤️');return;}
   addMsg('ai',`Generating "${prompt}"... 🔥`);
-  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
-  const img=new Image();img.src=url;img.onload=()=>{chatEl.lastChild.remove();addMsg('ai',prompt,url);localStorage.setItem(k,String(u+1));getCredits();chats.push({title:prompt.slice(0,30)});saveChats();mode='chat';};img.onerror=()=>{chatEl.lastChild.remove();addMsg('ai','Failed da, retry!');}
- }else{
-  addMsg('ai','<span id="tmp">Thinking... ✨</span>');
-  try{const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?model=openai`);const txt=await res.text();document.getElementById('tmp').parentElement.innerText=txt;chats.push({title:q.slice(0,30)});saveChats();}catch{ document.getElementById('tmp').innerText='Error da!';}
+  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768&enhance=true`;
+  const img=new Image();img.src=url;
+  img.onload=()=>{try{chatEl.lastChild.remove();}catch{} addMsg('ai',prompt,url);localStorage.setItem(k,String(u+1));getCredits();chats.push({title:prompt.slice(0,30)});saveChats();mode='chat';};
+  img.onerror=()=>{try{chatEl.lastChild.remove();}catch{} addMsg('ai','Image fail da, again try pannu!');}
+  return;
+ }
+
+ const msgId='ai_'+Date.now();
+ addMsg('ai',`<span id="${msgId}">⚡ Typing...</span>`);
+ const el=document.getElementById(msgId);
+ const fastPrompt=`You are Scarlet AI. Reply in the SAME language user used (Tamil, Hindi, Telugu, Malayalam, Kannada, Bengali, English, Tanglish, Hinglish, etc). Keep it friendly, concise, fast. User: ${q}`;
+
+ try{
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),15000);
+  const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(fastPrompt)}?model=openai&seed=${Date.now()}`,{signal:controller.signal});
+  clearTimeout(timeout);
+  if(!res.ok) throw new Error('fail');
+  const txt=await res.text();
+  // fast typing effect
+  let i=0; el.parentElement.innerText='';
+  const interval=setInterval(()=>{el.parentElement.innerText=txt.slice(0,i); i+=6; chatEl.scrollTop=chatEl.scrollHeight; if(i>=txt.length){clearInterval(interval); el.parentElement.innerText=txt;}},10);
+  chats.push({title:q.slice(0,30)});saveChats();
+ }catch(e){
+  try{
+   const res2=await fetch(`https://api.pollinations.ai/v1/chat/completions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai',messages:[{role:'user',content:fastPrompt}],stream:false})});
+   const data=await res2.json();
+   const txt=data.choices?.[0]?.message?.content||'Sorry da, try again!';
+   el.parentElement.innerText=txt;
+   chats.push({title:q.slice(0,30)});saveChats();
+  }catch{ el.innerText='Network slow da, again try pannu 🙏'; }
  }
 }
 document.getElementById('sendBtn').onclick=send;
