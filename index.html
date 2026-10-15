@@ -1,40 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Scarlet AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scarlet AI - Free ChatGPT Clone</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:system-ui;display:flex;height:100vh}
-.side{width:280px;background:#0f0f0f;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column}
-.logo{display:flex;align-items:center;gap:12px;margin-bottom:15px}
-.logo img{width:50px;height:50px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 15px #ff0040}
-.chat{flex:1;overflow:auto;padding:20px}
-.msg{margin:10px 0;padding:12px;border-radius:12px;max-width:85%}
-.user{background:#ff0040;margin-left:auto}
-.ai{background:#1a1a1a;display:flex;gap:10px}
-.ai img{width:30px;height:30px;border-radius:50%}
+body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;display:flex;height:100vh;overflow:hidden}
+.side{width:285px;background:#0f0f0f;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #222}
+.logo img{width:48px;height:48px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 12px #ff0040;object-fit:cover}
+.logo b{color:#ff0040;letter-spacing:0.5px}
+.main{flex:1;display:flex;flex-direction:column;background:#080808}
+.top{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;background:#0a0a0a}
+.chat{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.msg{padding:12px 16px;border-radius:14px;max-width:86%;line-height:1.6;font-size:14px}
+.user{background:#ff0040;margin-left:auto;color:#fff}
+.ai{background:#1a1a1a;border:1px solid #262626;display:flex;gap:10px;align-items:flex-start}
+.ai img{width:28px;height:28px;border-radius:50%;border:1px solid #333}
+.box{padding:14px 16px;border-top:1px solid #222;display:flex;gap:10px;background:#0a0a0a}
+.box input{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:13px 16px;border-radius:12px;outline:none}
+.box input:focus{border-color:#ff0040}
+.box button{background:#ff0040;color:#fff;border:none;padding:13px 20px;border-radius:12px;font-weight:bold;cursor:pointer}
+#lim{background:#161616;border:1px solid #222;padding:12px;border-radius:10px;font-size:13px;line-height:1.6}
+.adBtn{background:#00ff88!important;color:#000!important;border:none!important;padding:11px!important;border-radius:10px!important;font-weight:bold!important;width:100%!important;cursor:pointer;margin-top:10px}
+.progress{height:6px;background:#222;border-radius:10px;margin-top:8px;overflow:hidden}
+.progress div{height:100%;background:linear-gradient(90deg,#ff0040,#ff8a00);transition:0.3s}
 </style>
 </head>
 <body>
 <div class="side">
 <div class="logo">
-<img src="LOGO_URL" id="logoImg">
-<div><b style="color:#ff0040">SCARLET AI</b><br><small style="color:#666">Free • 16/day</small></div>
+<img src="IMG-20261015-WA4421.jpg">
+<div><b>SCARLET AI</b><br><small style="color:#777;font-size:11px">Free • No Paid</small></div>
 </div>
-<div id="lim" style="background:#1a1a1a;padding:10px;border-radius:8px;font-size:13px"></div>
-<button onclick="watchAd()" style="margin-top:10px;background:#00ff88;color:#000;border:none;padding:10px;width:100%;border-radius:8px;font-weight:bold">📺 Watch Ad +2</button>
+<div id="lim">Loading...</div>
+<button class="adBtn" onclick="watchAd()">📺 Watch Ad +2 Credits</button>
+<div style="margin-top:auto;background:#111;padding:10px;border-radius:8px;border:1px solid #222">
+<p style="color:#00ff88;font-size:12px;font-weight:bold">💰 Earning Model</p>
+<p style="color:#888;font-size:11px;margin-top:4px;line-height:1.5">Free: 6/day<br>Ad: 1 Ad = 2 Credits<br>Max: 5 Ads = 10<br>Total: 16/day FREE</p>
 </div>
-<div class="main" style="flex:1;display:flex;flex-direction:column">
+<p style="color:#444;font-size:10px;margin-top:12px;text-align:center">Scarlet AI by Hari 🔥</p>
+</div>
+<div class="main">
+<div class="top"><b>Scarlet AI Chat</b><small style="color:#666">Scarlet Model • Free</small></div>
 <div class="chat" id="chat"></div>
-<div style="padding:15px;border-top:1px solid #222;display:flex;gap:10px">
-<input id="inp" style="flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:12px;border-radius:10px" placeholder="Message Scarlet AI...">
-<button onclick="send()" style="background:#ff0040;color:#fff;border:none;padding:12px 18px;border-radius:10px;font-weight:bold">Send</button>
+<div class="box">
+<input id="inp" placeholder="Message Scarlet AI..." autocomplete="off">
+<button onclick="send()">Send 🚀</button>
 </div>
 </div>
 <script>
-// SAME ADS LOGIC AS BEFORE - COPY PASTE
+const FREE=6, PER_AD=2, MAX_ADS=5;
+function getU(){
+  const d=new Date().toDateString();
+  return {used:parseInt(localStorage.getItem(`use_${d}`)||"0"),adC:parseInt(localStorage.getItem(`adC_${d}`)||"0"),adW:parseInt(localStorage.getItem(`adW_${d}`)||"0"),d,total(){return FREE+this.adC}}
+}
+function update(){
+  const u=getU();const pct=Math.min(100,(u.used/u.total()*100));
+  document.getElementById('lim').innerHTML=`<div style="display:flex;justify-content:space-between"><b>${u.used}/${u.total()} Used</b><span style="color:${pct>80?'#ff4444':'#00ff88'}">${pct.toFixed(0)}%</span></div><small style="color:#888">${FREE} free + ${u.adC} ad credits • ${u.adW}/${MAX_ADS} ads</small><div class="progress"><div style="width:${pct}%"></div></div>`;
+}
+function can(){
+  const u=getU();
+  if(u.used>=u.total()){
+    if(u.adW>=MAX_ADS){alert(`Dei! ${u.total()}/16 over da! Naalaiku 6 free reset!`)}else{if(confirm(`🔥 Limit Over! ${u.used}/${u.total()} mudinchiduchu!\n📺 Ad paathu +2 credits vaangava?`)){watchAd()}}
+    return false
+  }return true
+}
+function send(){
+  const i=document.getElementById('inp');const t=i.value.trim();if(!t||!can())return;
+  const c=document.getElementById('chat');const img=`IMG-20261015-WA4421.jpg`;
+  c.innerHTML+=`<div class="msg user">${t.replace(/</g,"&lt;")}</div>`;i.value="";
+  const u=getU();localStorage.setItem(`use_${u.d}`,u.used+1);update();
+  const id="ai_"+Date.now();
+  c.innerHTML+=`<div class="msg ai" id="${id}"><img src="${img}"><div>Thinking...</div></div>`;c.scrollTop=c.scrollHeight;
+  setTimeout(()=>{
+    document.getElementById(id).innerHTML=`<img src="${img}"><div><b>Scarlet:</b> Dei Hari! Un question: <i>"${t.replace(/</g,"&lt;")}"</i><br><br>🔥 Naan Scarlet AI da! Ithu demo answer! OpenAI API add panna real answer varum! Ippo ${u.total()-u.used-1} credits left da!</div>`;
+    c.scrollTop=c.scrollHeight;
+  },800);
+}
+function watchAd(){
+  const u=getU();if(u.adW>=MAX_ADS){alert("Today 5 ads over da! Max 10 credits!");return}
+  const b=document.createElement('div');b.id="adBox";
+  b.style="position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px";
+  b.innerHTML=`<div style="background:#1e1e1e;max-width:360px;width:100%;border-radius:18px;overflow:hidden;border:1px solid #333">
+  <div style="padding:12px 14px;background:#2a2a2a;display:flex;justify-content:space-between"><small style="color:#fff;font-weight:bold">📺 Watch Ad - Earn +2</small><small id="tm" style="color:#00ff88;background:#000;padding:4px 8px;border-radius:6px">15s</small></div>
+  <div style="height:260px;background:linear-gradient(135deg,#ff0040 0%,#000 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;color:#fff">
+  <div style="font-size:40px">📺</div><b style="font-size:16px;margin-top:8px">GOOGLE ADSENSE AD</b><p style="font-size:13px;margin-top:8px;color:#ddd">Un AdSense code inga varum da!<br>15 sec full paaru = +2 Credits!</p><small style="margin-top:12px;background:rgba(255,255,255,0.1);padding:6px 10px;border-radius:20px;font-size:11px">1 Ad = 2 Credits • 5 Ads = 10/day</small></div>
+  <div style="padding:16px"><button id="clm" disabled style="width:100%;padding:13px;background:#444;color:#aaa;border:none;border-radius:10px;font-weight:bold">Wait 15s...</button><button onclick="document.getElementById('adBox').remove()" style="width:100%;margin-top:10px;background:transparent;color:#666;border:none;font-size:13px">Skip (No credits)</button></div></div>`;
+  document.body.appendChild(b);let tt=15;
+  const iv=setInterval(()=>{
+    tt--;const el=document.getElementById('tm');const btn=document.getElementById('clm');if(!el||!btn){clearInterval(iv);return}
+    el.innerText=tt+"s";btn.innerText=`Wait ${tt}s...`;
+    if(tt<=0){clearInterval(iv);btn.disabled=false;btn.style.background="#00ff88";btn.style.color="#000";btn.style.cursor="pointer";btn.innerText="✅ Claim +2 Credits!";
+    btn.onclick=()=>{localStorage.setItem(`adC_${u.d}`,u.adC+2);localStorage.setItem(`adW_${u.d}`,u.adW+1);document.getElementById('adBox').remove();alert(`🔥 +2 Credits Added Da!\nTotal: ${u.total()+2} • Used: ${u.used}/${u.total()+2}`);update()}}
+  },1000);
+}
+update();
+document.getElementById('chat').innerHTML=`<div class="msg ai"><img src="IMG-20261015-WA4421.jpg"><div>Vanakkam da Hari! 🔥<br><br><b>Scarlet AI Ready!</b><br>• 6 Free chats / day<br>• 📺 Watch Ad = +2 credits<br>• Max 5 ads = 10 extra<br>• Total 16/day - No Paid!<br><br>Type pannu da - Let's go! 🚀</div></div>`;
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
 </script>
 </body>
 </html>
