@@ -3,163 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scarlet AI - Chat & Image</title>
+<title>Scarlet AI</title>
+<link rel="icon" href="logo.png">
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://accounts.google.com/gsi/client"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:system-ui}
-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #222;position:sticky;top:0;background:#0a0a0a;z-index:10}
-.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px}
-.logo-img{width:38px;height:38px;border-radius:50%;border:2px solid #ff0040;object-fit:cover}
-.login-btn{background:#fff;color:#000;border:0;padding:8px 16px;border-radius:20px;font-weight:800;cursor:pointer}
-.credit{font-size:11px;color:#aaa;border:1px solid #333;padding:4px 8px;border-radius:20px}
-.user-box{display:flex;align-items:center;gap:8px}
-.user-avatar{width:32px;height:32px;border-radius:50%;border:2px solid #ff0040;object-fit:cover;background:#222}
-.tabs{display:flex;gap:10px;max-width:700px;margin:14px auto 0;padding:0 16px}
-.tab{flex:1;padding:10px;border-radius:12px;border:1px solid #333;background:#151515;color:#aaa;font-weight:700;cursor:pointer;text-align:center;transition:0.2s}
-.tab.active{background:#fff;color:#000;border-color:#fff}
-.main{max-width:700px;margin:0 auto;padding:12px 16px 100px}
-.card{background:#141414;border:1px solid #222;border-radius:16px;padding:14px;margin-top:12px}
-textarea,input{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:12px;color:#fff;outline:none;resize:none;font-size:14px}
-.gen-btn{width:100%;margin-top:10px;background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:13px;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;font-size:15px}
-#result img{width:100%;border-radius:12px;margin-top:12px}
-.chat-msg{padding:10px 12px;border-radius:12px;margin:8px 0;max-width:90%;line-height:1.4;font-size:14px;word-break:break-word}
-.user-msg{background:#ff0040;margin-left:auto}
-.ai-msg{background:#1e1e1e;border:1px solid #333}
-#chatBox{max-height:60vh;overflow-y:auto;display:flex;flex-direction:column}
-.dl-btn{margin-top:8px;background:#fff;color:#000;border:0;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer;width:100%}
+body{background:#0a0a0a;color:#fff;font-family:system-ui;display:flex;height:100vh;overflow:hidden}
+.sidebar{width:270px;background:#111;border-right:1px solid #222;display:flex;flex-direction:column;padding:14px;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}
+.logo img{width:42px;height:42px;border-radius:50%;border:2px solid #ff0040;box-shadow:0 0 15px #ff004055;object-fit:cover}
+.new-chat{background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;padding:12px;border-radius:12px;color:#fff;font-weight:800;cursor:pointer}
+.history{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.hist-item{padding:10px 12px;background:#181818;border:1px solid #222;border-radius:10px;font-size:13px;color:#aaa;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-item:hover{background:#222;color:#fff}
+.main{flex:1;display:flex;flex-direction:column;background:#0a0a0a;position:relative}
+.topbar{padding:14px 18px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
+.topbar h2{font-size:16px;display:flex;align-items:center;gap:8px}
+.chat{flex:1;overflow-y:auto;padding:20px;max-width:800px;width:100%;margin:0 auto}
+.msg{margin:14px 0;display:flex;gap:10px;animation:fade 0.2s}
+.msg img.avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;object-fit:cover;border:2px solid #ff0040;background:#000}
+.bubble{padding:12px 14px;border-radius:16px;max-width:85%;line-height:1.5;font-size:14.5px;white-space:pre-wrap;word-break:break-word}
+.user.bubble{background:linear-gradient(135deg,#ff0040,#ff6a00);margin-left:auto;color:#fff}
+.ai.bubble{background:#1a1a1a;border:1px solid #2a2a2a}
+.ai.bubble img{width:100%;border-radius:12px;margin-top:10px}
+.inputArea{padding:14px 16px;border-top:1px solid #222;background:#0a0a0a}
+.inputWrap{max-width:800px;margin:0 auto;display:flex;gap:10px;background:#181818;border:1px solid #333;border-radius:24px;padding:8px 8px 8px 16px;align-items:center}
+.inputWrap input{flex:1;background:transparent;border:0;color:#fff;outline:none;font-size:15px}
+.inputWrap button{background:linear-gradient(135deg,#ff0040,#ff6a00);border:0;width:36px;height:36px;border-radius:50%;color:#fff;font-weight:800;cursor:pointer;display:grid;place-items:center}
+.tab{padding:6px 12px;border-radius:20px;border:1px solid #333;background:#181818;color:#aaa;font-size:12px;cursor:pointer}
+.tab.active{background:#fff;color:#000}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-<header>
-<div class="logo"><img src="logo.png" onerror="this.src='https://i.imgur.com/8QJ4sQv.png'" class="logo-img"> Scarlet AI</div>
-<div style="display:flex;gap:8px;align-items:center">
-<div class="credit" id="credit">6/6</div>
-<button class="login-btn" id="loginBtn">Login</button>
-<div id="userInfo" class="user-box" style="display:none"></div>
+<div class="sidebar">
+<div class="logo"><img src="logo.png"> Scarlet AI <span style="font-size:10px;background:#222;padding:3px 6px;border-radius:6px;margin-left:6px">v1.5</span></div>
+<button class="new-chat" onclick="newChat()">+ New Chat</button>
+<div style="font-size:11px;color:#555;margin-top:8px">CHAT HISTORY</div>
+<div class="history" id="history"></div>
+<div style="margin-top:auto;padding-top:10px;border-top:1px solid #222;display:flex;align-items:center;gap:8px">
+<img id="sideAvatar" src="logo.png" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #ff0040;object-fit:cover">
+<div><div id="sideName" style="font-size:13px;font-weight:700">Mσcσ</div><div style="font-size:11px;color:#777">Free Plan</div></div>
 </div>
-</header>
-
-<div class="tabs">
-<div class="tab active" id="tabChat" onclick="switchTab('chat')">💬 ChatGPT</div>
-<div class="tab" id="tabImg" onclick="switchTab('img')">🎨 Image</div>
 </div>
 
 <div class="main">
-<div id="chatTab" class="card">
-<div id="chatBox"><div class="chat-msg ai-msg">Hi da Moco! Naan Scarlet AI da! Enna pannalam? 😎</div></div>
-<div style="display:flex;gap:8px;margin-top:12px">
-<input id="chatInput" placeholder="Ask anything...">
-<button class="gen-btn" style="width:80px;margin-top:0" id="chatSend">Send</button>
+<div class="topbar">
+<h2><img src="logo.png" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ff0040;object-fit:cover"> Scarlet AI • GPT-5</h2>
+<div style="display:flex;gap:8px;align-items:center">
+<span id="credit" style="font-size:11px;border:1px solid #333;padding:4px 8px;border-radius:20px;color:#aaa">6/6</span>
+<button class="login-btn" id="loginBtn" style="background:#fff;color:#000;border:0;padding:7px 14px;border-radius:20px;font-weight:800;cursor:pointer">Login</button>
+<div id="userInfo" style="display:none"></div>
 </div>
 </div>
 
-<div id="imgTab" class="card" style="display:none">
-<h3>✨ Create Image</h3>
-<textarea id="prompt" rows="3" placeholder="Scarlet Vandimion anime character, ultra detailed..."></textarea>
-<button class="gen-btn" id="genBtn">Generate (1 Credit)</button>
-<div id="result"></div>
+<div class="chat" id="chat">
+<div class="msg"><img class="avatar" src="logo.png"><div class="bubble ai">Hello! I'm Scarlet AI ✨ White hair queen here! 🔥<br>How can I help you today da Moco?<br><br>Type anything to chat. Type <b>/image a cyberpunk girl</b> to generate image!</div></div>
+</div>
+
+<div class="inputArea">
+<div style="max-width:800px;margin:0 auto 10px;display:flex;gap:8px">
+<div class="tab active" id="tabChat2" onclick="setMode('chat')">💬 Chat</div>
+<div class="tab" id="tabImg2" onclick="setMode('image')">🎨 Image</div>
+</div>
+<div class="inputWrap">
+<input id="inp" placeholder="Message Scarlet AI...">
+<button id="sendBtn">➤</button>
+</div>
+<div style="text-align:center;font-size:10px;color:#555;margin-top:8px">Scarlet AI • Mσcσ's logo</div>
 </div>
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",
-  authDomain: "scarlet-ai-fa68c.firebaseapp.com",
-  projectId: "scarlet-ai-fa68c",
-  storageBucket: "scarlet-ai-fa68c.firebasestorage.app",
-  messagingSenderId: "145131745721",
-  appId: "1:145131745721:web:dfa412973efb2f37c3c668"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const loginBtn = document.getElementById('loginBtn');
-const userInfo = document.getElementById('userInfo');
-const GOOGLE_CLIENT_ID = "145131745721-gu1u800lif4elinkbb09s06aktel90fr.apps.googleusercontent.com";
-
-function handleCredentialResponse(r){
-  const credential = firebase.auth.GoogleAuthProvider.credential(r.credential);
-  loginBtn.innerText="Logging...";
-  auth.signInWithCredential(credential).catch(e=>{alert(e.message); loginBtn.innerText="Login";});
-}
-function initGSI(){
-  if(!window.google || !google.accounts){ setTimeout(initGSI,500); return; }
-  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse,auto_select:false});
-}
-initGSI();
-loginBtn.onclick=()=>{ if(!window.google) return alert("Wait 2 sec da"); google.accounts.id.prompt(); };
-
-auth.onAuthStateChanged((user)=>{
-  if(user){
-    console.log("USER:", user.displayName, user.photoURL, user.email);
-    loginBtn.style.display='none';
-    userInfo.style.display='flex';
-    const photo = user.photoURL ? user.photoURL : `https://ui-avatars.com/api/?name=Moco&background=ff0040&color=fff&bold=true`;
-    const name = user.displayName || "Mσcσ";
-    userInfo.innerHTML = `<img src="${photo}" class="user-avatar" referrerpolicy="no-referrer"><span style="font-size:13px;font-weight:800;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span><button onclick="firebase.auth().signOut().then(()=>location.reload())" style="margin-left:4px;padding:5px 10px;border-radius:12px;background:#222;color:#fff;border:1px solid #444;cursor:pointer;font-size:11px">Logout</button>`;
+const firebaseConfig = {apiKey:"AIzaSyAJagbPj-jtLCYeTE-PDOWc9tuhXCl6PdE",authDomain:"scarlet-ai-fa68c.firebaseapp.com",projectId:"scarlet-ai-fa68c",storageBucket:"scarlet-ai-fa68c.firebasestorage.app",messagingSenderId:"145131745721",appId:"1:145131745721:web:dfa412973efb2f37c3c668"};
+firebase.initializeApp(firebaseConfig); const auth=firebase.auth();
+const GOOGLE_CLIENT_ID="145131745721-gu1u800lif4elinkbb09s06aktel90fr.apps.googleusercontent.com";
+let mode='chat';
+function handleCred(r){const c=firebase.auth.GoogleAuthProvider.credential(r.credential); auth.signInWithCredential(c);}
+function initGSI(){if(!window.google||!google.accounts){setTimeout(initGSI,500);return;} google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCred,auto_select:false});}
+initGSI(); document.getElementById('loginBtn').onclick=()=>google.accounts.id.prompt();
+auth.onAuthStateChanged(u=>{
+  if(u){
+    document.getElementById('loginBtn').style.display='none';
+    const ui=document.getElementById('userInfo'); ui.style.display='flex'; ui.style.alignItems='center'; ui.style.gap='8px';
+    const photo=u.photoURL||`https://ui-avatars.com/api/?name=Moco&background=ff0040&color=fff`;
+    const name=u.displayName||"Mσcσ";
+    ui.innerHTML=`<img src="${photo}" style="width:32px;height:32px;border-radius:50%;border:2px solid #ff0040"><span style="font-size:13px;font-weight:700">${name}</span><button onclick="firebase.auth().signOut().then(()=>location.reload())" style="background:#222;color:#fff;border:1px solid #444;padding:4px 8px;border-radius:10px;cursor:pointer;font-size:11px">Logout</button>`;
+    document.getElementById('sideAvatar').src=photo; document.getElementById('sideName').innerText=name;
   }else{
-    loginBtn.style.display='block';
-    userInfo.style.display='none';
-    loginBtn.innerText="Login";
+    document.getElementById('loginBtn').style.display='block';
+    document.getElementById('userInfo').style.display='none';
+    document.getElementById('sideAvatar').src='logo.png';
+    document.getElementById('sideName').innerText='Mσcσ';
   }
 });
-
-function switchTab(t){
-  document.getElementById('tabChat').classList.toggle('active', t==='chat');
-  document.getElementById('tabImg').classList.toggle('active', t==='img');
-  document.getElementById('chatTab').style.display = t==='chat' ? 'block' : 'none';
-  document.getElementById('imgTab').style.display = t==='img' ? 'block' : 'none';
+function getCredits(){const k='img_use_'+new Date().toDateString();let u=parseInt(localStorage.getItem(k)||"0");if(isNaN(u))u=0;document.getElementById('credit').innerText=`${6-u}/6`;return {u,k};} getCredits();
+const chatEl=document.getElementById('chat'); const historyEl=document.getElementById('history');
+let chats=JSON.parse(localStorage.getItem('scarlet_chats')||"[]");
+function renderHistory(){historyEl.innerHTML=''; chats.slice().reverse().forEach((c,i)=>{const d=document.createElement('div'); d.className='hist-item'; d.innerText=c.title; d.onclick=()=>{document.getElementById('inp').value=c.title;}; historyEl.appendChild(d);});} renderHistory();
+function newChat(){chatEl.innerHTML=`<div class="msg"><img class="avatar" src="logo.png"><div class="bubble ai">New chat started da Moco! Enna pannalam? ✨</div></div>`;}
+function setMode(m){mode=m; document.getElementById('tabChat2').classList.toggle('active',m==='chat'); document.getElementById('tabImg2').classList.toggle('active',m==='image'); document.getElementById('inp').placeholder=m==='image'?'Describe image... eg: Scarlet white hair':'Message Scarlet AI...';}
+function addMsg(role,text,isImg){
+  const div=document.createElement('div'); div.className='msg';
+  const avatar=role==='user'?`<img class="avatar" src="${auth.currentUser?.photoURL||'https://ui-avatars.com/api/?name=M&background=ff0040&color=fff'}" style="border:2px solid #ff0040">`:`<img class="avatar" src="logo.png">`;
+  let bubble=role==='user'?`<div class="bubble user">${text}</div>`:`<div class="bubble ai">${text}${isImg?`<br><img src="${isImg}" style="width:100%;border-radius:12px;margin-top:8px">`:''}</div>`;
+  div.innerHTML=avatar+bubble; chatEl.appendChild(div); chatEl.scrollTop=chatEl.scrollHeight;
 }
-
-function getCredits(){
-  const k='img_use_'+new Date().toDateString();
-  let u=parseInt(localStorage.getItem(k)||"0"); if(isNaN(u)) u=0;
-  document.getElementById('credit').innerText=`${6-u}/6`;
-  return {u,k};
-}
-getCredits();
-
-document.getElementById('genBtn').onclick=()=>{
-  const p=document.getElementById('prompt').value.trim();
-  if(!p) return alert("Prompt type pannu da!");
-  let {u,k}=getCredits(); if(u>=6) return alert("Daily 6 over da!");
-  const b=document.getElementById('genBtn'); b.disabled=true; b.innerText="Generating... 🔥";
-  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
-  const r=document.getElementById('result');
-  const img=new Image(); img.crossOrigin="anonymous"; img.src=url;
-  img.onload=()=>{
-    r.innerHTML=''; 
-    r.appendChild(img);
-    const dl=document.createElement('button'); dl.className='dl-btn'; dl.innerText='⬇️ Download';
-    dl.onclick=()=>{ const a=document.createElement('a'); a.href=img.src; a.download='scarlet-'+Date.now()+'.png'; a.click(); };
-    r.appendChild(dl);
-    b.disabled=false; b.innerText='Generate (1 Credit)'; localStorage.setItem(k,String(u+1)); getCredits();
-  };
-  img.onerror=()=>{ b.disabled=false; b.innerText='Generate (1 Credit)'; alert("Failed da"); };
-};
-
-const chatBox=document.getElementById('chatBox');
-const chatInput=document.getElementById('chatInput');
-async function sendChat(){
-  const q=chatInput.value.trim(); if(!q) return;
-  chatBox.innerHTML+=`<div class="chat-msg user-msg">${q}</div>`;
-  chatInput.value=''; chatBox.scrollTop=chatBox.scrollHeight;
-  const loadingId='load_'+Date.now();
-  chatBox.innerHTML+=`<div class="chat-msg ai-msg" id="${loadingId}">Typing... ✨</div>`;
-  chatBox.scrollTop=chatBox.scrollHeight;
-  try{
-    const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?model=openai`);
-    const text=await res.text();
-    document.getElementById(loadingId).innerText=text;
-  }catch(e){
-    document.getElementById(loadingId).innerText="Error da Moco, network check pannu!";
+async function send(){
+  const inp=document.getElementById('inp'); const q=inp.value.trim(); if(!q) return;
+  addMsg('user',q); inp.value='';
+  const isImageReq = mode==='image' || q.toLowerCase().startsWith('/image');
+  const prompt = q.replace('/image','').trim() || q;
+  if(isImageReq){
+    let {u,k}=getCredits(); if(u>=6){addMsg('ai','Daily 6 over da Moco! Tomorrow va!');return;}
+    addMsg('ai',`Generating "${prompt}"... 🔥`);
+    const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${Math.floor(Math.random()*99999)}&nologo=true&width=768&height=768`;
+    const img=new Image(); img.src=url; img.onload=()=>{chatEl.lastChild.remove(); addMsg('ai',prompt,url); localStorage.setItem(k,String(u+1)); getCredits(); chats.push({title:prompt.substring(0,30)}); localStorage.setItem('scarlet_chats',JSON.stringify(chats)); renderHistory();}; img.onerror=()=>{chatEl.lastChild.remove(); addMsg('ai','Failed da!');}
+  }else{
+    addMsg('ai','<span id="tmp">Scarlet typing... ✨</span>');
+    try{const res=await fetch(`https://text.pollinations.ai/${encodeURIComponent(q)}?model=openai`); const txt=await res.text(); document.getElementById('tmp').innerText=txt; document.getElementById('tmp').id=''; chats.push({title:q.substring(0,30)}); localStorage.setItem('scarlet_chats',JSON.stringify(chats)); renderHistory();}catch(e){document.getElementById('tmp').innerText='Error da!';}
   }
-  chatBox.scrollTop=chatBox.scrollHeight;
 }
-document.getElementById('chatSend').onclick=sendChat;
-chatInput.addEventListener('keypress',(e)=>{ if(e.key==='Enter') sendChat(); });
+document.getElementById('sendBtn').onclick=send;
+document.getElementById('inp').addEventListener('keypress',e=>{if(e.key==='Enter') send();});
 </script>
 </body>
 </html>
