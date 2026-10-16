@@ -1,148 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scarlet AI</title>
 <link rel="icon" href="logo.png">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://js.puter.com/v2/"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:system-ui;height:100vh;height:100dvh;display:flex;overflow:hidden}
-.sidebar{width:270px;background:#171717;display:flex;flex-direction:column;padding:12px}
-.sb-logo{display:flex;gap:8px;align-items:center;padding:10px;font-weight:700}
-.sb-logo img{width:26px;height:26px;border-radius:50%;border:1px solid #ff0040}
-.sb-item{padding:10px;border-radius:10px;font-size:14px;cursor:pointer;background:#2f2f2f;margin-top:10px;text-align:center}
-.user-box{margin-top:auto;background:#222;border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px}
-.user-box img{width:36px;height:36px;border-radius:50%;background:#333}
-.user-box.info{flex:1;overflow:hidden}.user-box.info b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-box.info span{font-size:11px;color:#888}
-.btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700}
-.btn-white{background:#fff;color:#000;width:100%}.btn-dark{background:#333;color:#fff}
-.main{flex:1;display:flex;flex-direction:column;background:#000}
-.top{height:56px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
-.top-avatar{width:34px;height:34px;border-radius:50%;background:#a855f7;display:flex;align-items:center;justify-content:center;font-weight:bold;overflow:hidden;cursor:pointer}
-.top-avatar img{width:100%;height:100%;object-fit:cover}
-.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
-.msg{max-width:85%;padding:12px 14px;border-radius:16px;line-height:1.5;white-space:pre-wrap;word-break:break-word;font-size:14px}
-.user{align-self:flex-end;background:#2f2f2f}.ai{align-self:flex-start;background:#171717;border:1px solid #222}
-.bottom{padding:12px;border-top:1px solid #222;display:flex;gap:8px;background:#000}
-#inp{flex:1;padding:13px 18px;border-radius:24px;border:none;background:#1f1f1f;color:#fff;outline:none;font-size:15px}
-#send{width:42px;height:42px;border-radius:50%;border:none;background:#fff;color:#000;font-weight:bold;cursor:pointer}
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#ececec;font-family:Inter,system-ui;height:100vh;height:100dvh;display:flex;flex-direction:column}
+#header{height:64px;background:#121212;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+#header .left{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:700}
+#header .left img{width:32px;height:32px;border-radius:50%}
+#header .right{display:flex;gap:16px;align-items:center;color:#8e8e8e}
+#wrap{flex:1;display:flex;overflow:hidden}
+#sidebar{width:260px;background:#111;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column;gap:4px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;cursor:pointer;font-size:14px;color:#c7c7c7}
+.sb-item.active{background:#1e1e1e;color:#fff}
+.sb-item:hover{background:#1a1a1a}
+.sb-item svg{width:18px;height:18px}
+#user{margin-top:auto;background:#1a1a1a;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
+#main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#logo{width:120px;height:120px;margin-bottom:16px}
+#logo img{width:100%;height:100%;object-fit:contain}
+#title{font-size:42px;font-weight:700;margin-bottom:8px}
+#subtitle{color:#8e8e8e;margin-bottom:28px}
+#cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:700px;width:100%;margin-bottom:30px}
+.card{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px}
+.card:hover{background:#252525}
+.card svg{width:20px;height:20px;flex-shrink:0}
+#inputWrap{width:100%;max-width:760px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:28px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px}
+#send{width:38px;height:38px;border-radius:50%;background:#ff0033;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#chat{width:100%;max-width:760px;display:none;flex-direction:column;gap:16px;margin-bottom:20px}
+.msg{max-width:85%;padding:14px 16px;border-radius:18px;line-height:1.6;font-size:14px;white-space:pre-wrap}
+.msg.user{align-self:flex-end;background:#2a2a2a}.msg.ai{align-self:flex-start;background:#121212;border:1px solid #2a2a2a}
 </style>
 </head>
 <body>
-
-<div class="sidebar">
-<div class="sb-logo"><img src="logo.png" onerror="this.style.display='none'"><span>Scarlet AI</span></div>
-<div class="sb-item" onclick="newChat()">+ New Chat</div>
-
-<div id="loginSection" class="user-box">
-<div style="text-align:center;width:100%;padding:10px">
-<p style="font-size:12px;color:#aaa;margin-bottom:8px">Login panna avatar varum</p>
-<button class="btn btn-white" onclick="loginGoogle()">🔐 Log in with Google</button>
-<div id="g_id_onload" data-client_id="1061021464506-9hl0pr8j3bq4j3j6q7q6q6q6q6.apps.googleusercontent.com" data-callback="handleCredential"></div>
+<div id="header">
+<div class="left"><img src="logo.png"> Scarlet AI</div>
+<div class="right"><span>◐</span><span>⚙</span><span style="width:32px;height:32px;background:#333;border-radius:50%;display:inline-block"></span></div>
+</div>
+<div id="wrap">
+<div id="sidebar">
+<div class="sb-item active"><svg viewBox="0 0 24 24" fill="none" stroke="#ff0033" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New chat</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Images</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Library</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Scheduled</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> Plugins</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Projects</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg> Codex</div>
+<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> More</div>
+<div id="user"><img src="logo.png" style="width:32px;height:32px;border-radius:50%"> <div><b style="font-size:13px">You</b></div></div>
+</div>
+<div id="main">
+<div id="logo"><img src="logo.png"></div>
+<div id="title">Scarlet AI</div>
+<div id="subtitle">How can I help you today?</div>
+<div id="cards">
+<div class="card" onclick="quick('Brainstorm product ideas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A7.5 7.5 0 0 0 2 9.5c0 5.4 7.5 11.5S17 14.9 17 9.5A7.5 7.5 0 0 0 9.5 2z"/></svg> Brainstorm product ideas</div>
+<div class="card" onclick="quick('Write and debug code')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg> Write and debug code</div>
+<div class="card" onclick="quick('Generate an image of')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Generate an image</div>
+<div class="card" onclick="quick('Summarize research paper')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Summarize research paper</div>
+</div>
+<div id="chat"></div>
+<div id="inputWrap"><button style="width:36px;height:36px;border-radius:50%;background:#2a2a2a;border:none;color:#fff">+</button><input id="inp" placeholder="Ask anything"><button id="send" onclick="sendMsg()">↑</button></div>
 </div>
 </div>
-
-<div id="userSection" class="user-box" style="display:none">
-<img id="sideAvatar" src="">
-<div class="info"><b id="userName">User</b><span id="userEmail">email</span></div>
-<button class="btn btn-dark" onclick="logout()">Logout</button>
-</div>
-</div>
-
-<div class="main">
-<div class="top">
-<span>Scarlet AI ✨ FREE</span>
-<div class="top-avatar" id="topAvatar" onclick="loginGoogle()">M</div>
-</div>
-<div class="chat" id="chat"></div>
-<div class="bottom"><input id="inp" placeholder="Ask anything da..."><button id="send" onclick="sendMsg()">↑</button></div>
-</div>
-
 <script>
-const chatEl = document.getElementById('chat');
-let messages = JSON.parse(localStorage.getItem('scarlet_msgs')||'[]');
-let user = JSON.parse(localStorage.getItem('scarlet_user')||'null');
-
-function newChat(){messages=[];localStorage.removeItem('scarlet_msgs');chatEl.innerHTML='';addAI('New chat da Krish! 🔥');}
-function addUser(t){let d=document.createElement('div');d.className='msg user';d.textContent=t;chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;}
-function addAI(t){let d=document.createElement('div');d.className='msg ai';d.textContent=t;chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;return d;}
-
-// === LOGIN LOGIC - NO FIREBASE NEEDED ===
-function parseJwt(token){try{return JSON.parse(atob(token.split('.')[1]));}catch(e){return null;}}
-
-function handleCredential(response){
- const data = parseJwt(response.credential);
- if(!data) return;
- user = {name: data.name, email: data.email, picture: data.picture};
- localStorage.setItem('scarlet_user', JSON.stringify(user));
- showUser();
-}
-
-function showUser(){
- if(user){
-  document.getElementById('loginSection').style.display='none';
-  document.getElementById('userSection').style.display='flex';
-  document.getElementById('sideAvatar').src = user.picture;
-  document.getElementById('userName').textContent = user.name;
-  document.getElementById('userEmail').textContent = user.email;
-  document.getElementById('topAvatar').innerHTML = `<img src="${user.picture}">`;
- } else {
-  document.getElementById('loginSection').style.display='flex';
-  document.getElementById('userSection').style.display='none';
-  document.getElementById('topAvatar').textContent = 'M';
- }
-}
-
-function loginGoogle(){
- // Google One Tap prompt - works without Firebase
- if(window.google && google.accounts){
-  google.accounts.id.initialize({
-   client_id: "1061021464506-9hl0pr8j3bq4j3j6q7q6q6q6q6.apps.googleusercontent.com".replace(/q6q6q6q6/,'dummy'), // public demo, will fallback
-   callback: handleCredential
-  });
-  // Fallback demo login (no real Google Cloud needed) - ask name
-  if(!user){
-   let name = prompt("Un Gmail name enna da? (Avatar ku)");
-   if(!name) return;
-   let pic = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=a855f7&color=fff`;
-   user = {name: name, email: name.toLowerCase()+'@gmail.com', picture: pic};
-   localStorage.setItem('scarlet_user', JSON.stringify(user));
-   showUser();
-  }
- } else {
-  let name = prompt("Google Login - Un name?");
-  if(!name) return;
-  let pic = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=a855f7&color=fff`;
-  user = {name: name, email: name.toLowerCase()+'@gmail.com', picture: pic};
-  localStorage.setItem('scarlet_user', JSON.stringify(user));
-  showUser();
- }
-}
-
-function logout(){
- user=null; localStorage.removeItem('scarlet_user');
- showUser();
-}
-
-// Chat
-async function sendMsg(){
- let q = document.getElementById('inp').value.trim(); if(!q) return;
- addUser(q); messages.push({role:'user', content:q}); localStorage.setItem('scarlet_msgs', JSON.stringify(messages));
- document.getElementById('inp').value=''; let th = addAI('⚡ Thinking...'); document.getElementById('send').disabled=true;
- try{
-  const resp = await puter.ai.chat(messages, {model: "gpt-4o-mini"});
-  let reply = resp.message.content; th.remove(); addAI(reply); messages.push({role:'assistant', content:reply});
-  localStorage.setItem('scarlet_msgs', JSON.stringify(messages));
- }catch(e){ th.textContent='❌ '+e.message; }
- document.getElementById('send').disabled=false;
-}
-document.getElementById('inp').addEventListener('keydown', e=>{if(e.key==='Enter') sendMsg();});
-
-// Init
-showUser();
-if(messages.length===0){ addAI('Vanakkam da Krish! 😎\n\n✅ Login = Gmail avatar varum\n✅ Logout = M thirumbi varum\n✅ Chat = Unlimited free\n\nLogin pannitu chat pannu da!'); }
-else { messages.forEach(m=>{ if(m.role==='user') addUser(m.content); else addAI(m.content); }); }
+let messages=[];
+function quick(t){document.getElementById('inp').value=t+' ';document.getElementById('inp').focus()}
+function addUser(t){let d=document.createElement('div');d.className='msg user';d.textContent=t;document.getElementById('chat').appendChild(d);document.getElementById('chat').style.display='flex';document.getElementById('logo').style.display='none';document.getElementById('title').style.display='none';document.getElementById('subtitle').style.display='none';document.getElementById('cards').style.display='none'}
+function addAI(t){let d=document.createElement('div');d.className='msg ai';d.textContent=t;document.getElementById('chat').appendChild(d);return d}
+async function sendMsg(){let q=document.getElementById('inp').value.trim();if(!q)return;addUser(q);document.getElementById('inp').value='';messages.push({role:'user',content:q});let th=addAI('Thinking...');try{let r=await puter.ai.chat(messages,{model:'gpt-4o-mini'});th.remove();addAI(r.message.content);messages.push({role:'assistant',content:r.message.content})}catch(e){th.textContent='Error: '+e.message}}
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg()})
 </script>
 </body>
 </html>
