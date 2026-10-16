@@ -1,197 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scarlet AI</title>
 <link rel="icon" href="logo.png">
 <script src="https://js.puter.com/v2/"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#ececec;font-family:Inter,system-ui,sans-serif;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
-#header{height:60px;background:#121212;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;z-index:20}
-#header.left{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700;cursor:pointer}
-#header.left img{width:32px;height:32px;border-radius:50%;border:1px solid #ff0033;background:#000;object-fit:cover}
-#header.right{display:flex;gap:10px;align-items:center}
-.h-icon{width:36px;height:36px;border-radius:10px;background:transparent;border:none;color:#8e8e8e;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.h-icon:hover{background:#1e1e1e;color:#fff}
-.avatar{width:32px;height:32px;border-radius:50%;background:#ff0033;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;cursor:pointer}
-.avatar img{width:100%;height:100%;object-fit:cover}
-#wrap{flex:1;display:flex;overflow:hidden;position:relative}
-#sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;background:#111;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:4px;transform:translateX(-100%);transition:transform.25s ease;z-index:50}
-#sidebar.open{transform:translateX(0)}
-@media(min-width:900px){#sidebar{position:relative;transform:translateX(0)}#sidebar.open{transform:translateX(0)}}
-.sb-top{display:flex;align-items:center;justify-content:space-between;padding:8px 8px 12px}
-.sb-logo{width:32px;height:32px;border-radius:50%;overflow:hidden;border:1px solid #ff0033;background:#000}
-.sb-logo img{width:100%;height:100%;object-fit:cover}
-.sb-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:14px;color:#c7c7c7}
-.sb-item.active{background:#1e1e1e;color:#fff}
-.sb-item:hover{background:#1e1e1e}
-.sb-item svg{width:18px;height:18px;stroke:#fff;flex-shrink:0}
-.sb-label{font-size:11px;color:#8e8e8e;text-transform:uppercase;padding:12px 10px 6px}
-.recents{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.recent{padding:9px 10px;border-radius:8px;font-size:13px;color:#c7c7c7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-.recent:hover{background:#1e1e1e}
-.user-bar{margin-top:auto;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px;cursor:pointer}
-.user-bar img{width:32px;height:32px;border-radius:50%}
-.user-bar b{font-size:13px;display:block}.user-bar span{font-size:11px;color:#8e8e8e}
-#main{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;width:100%;overflow:hidden}
-#center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:20px;width:100%;min-height:0}
-#logo{width:110px;height:110px;border-radius:50%;overflow:hidden;box-shadow:0 0 40px rgba(255,0,51,.4);border:2px solid #ff0033;margin-bottom:16px;flex-shrink:0}
-#logo img{width:100%;height:100%;object-fit:cover}
-#title{font-size:clamp(28px,6vw,40px);font-weight:700;margin-bottom:6px}
-#subtitle{color:#8e8e8e;font-size:15px;margin-bottom:24px;text-align:center}
-#cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:680px;width:100%;margin-bottom:24px}
-@media(max-width:600px){#cards{grid-template-columns:1fr}}
-.card{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;transition:.15s}
-.card:hover{background:#252525;border-color:#333}
-.card svg{width:20px;height:20px;flex-shrink:0}
-#chat{width:100%;max-width:760px;display:none;flex-direction:column;gap:14px;margin-bottom:16px}
-.msg{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-break:break-word}
-.msg.user{align-self:flex-end;background:#2a2a2a}.msg.ai{align-self:flex-start;background:#121212;border:1px solid #2a2a2a}
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#ececec;font-family:Inter,system-ui;height:100vh;height:100dvh;display:flex;overflow:hidden}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;background:#121212;transform:translateX(-100%);transition:.25s;z-index:100;display:flex;flex-direction:column;padding:12px;border-right:1px solid #222}
+#sidebar.open{transform:translateX(0)}@media(min-width:900px){#sidebar{position:relative;transform:none}}
+.sb-top{display:flex;align-items:center;justify-content:space-between;padding:8px}.sb-logo{width:32px;height:32px;border-radius:50%;overflow:hidden;border:1px solid #ff0033}.sb-logo img{width:100%;height:100%;object-fit:cover}
+.sb-item{display:flex;gap:12px;padding:11px 10px;border-radius:10px;cursor:pointer;color:#c7c7c7}.sb-item:hover{background:#1e1e1e}
+.recents{flex:1;overflow-y:auto}.recent{padding:8px 10px;font-size:13px;color:#8e8e8e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.user-bar{margin-top:auto;background:#1a1a1a;border:1px solid #222;border-radius:12px;padding:10px;display:flex;gap:10px;cursor:pointer}.user-bar img{width:32px;height:32px;border-radius:50%}
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+#header{height:56px;background:#121212;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex-shrink:0}
+.h-btn{width:36px;height:36px;border-radius:10px;background:transparent;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.avatar{width:32px;height:32px;border-radius:50%;background:#ff0033;display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;cursor:pointer}.avatar img{width:100%;height:100%;object-fit:cover}
+#center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:30px 20px 20px;width:100%}
+#centerLogo{width:120px;height:120px;min-width:120px;min-height:120px;max-width:120px;max-height:120px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid #ff0033;box-shadow:0 0 30px rgba(255,0,51,.4);margin-bottom:16px}
+#centerLogo img{width:100%;height:100%;object-fit:cover;display:block}
+#mainTitle{font-size:26px;font-weight:700;margin-bottom:4px}#subTitle{color:#8e8e8e;margin-bottom:20px;font-size:14px}
+#chat{width:100%;max-width:760px;display:none;flex-direction:column;gap:14px}
+.msg{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;white-space:pre-wrap;word-break:break-word}.msg.user{align-self:flex-end;background:#2a2a2a}.msg.ai{align-self:flex-start;background:#121212;border:1px solid #222}
 .msg img{max-width:100%;border-radius:12px;margin-top:8px}
-#bottom{width:100%;max-width:760px;padding:0 16px 16px;display:flex;justify-content:center;flex-shrink:0}
+#bottom{width:100%;max-width:760px;padding:12px 16px 16px;display:flex;justify-content:center;flex-shrink:0;margin:0 auto}
 #inputBar{width:100%;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:28px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-#inputRow{display:flex;align-items:center;gap:8px}
-#plusBtn{width:36px;height:36px;border-radius:50%;background:#2a2a2a;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px;min-width:0;padding:6px}
-#sendBtn{width:36px;height:36px;border-radius:50%;background:#ff0033;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-#sendBtn:disabled{opacity:.4}
+#inputRow{display:flex;align-items:center;gap:8px}#plusBtn{width:36px;height:36px;border-radius:50%;background:#2a2a2a;border:none;color:#fff;cursor:pointer;flex-shrink:0}#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px;min-width:0;padding:6px}#sendBtn{width:36px;height:36px;border-radius:50%;background:#ff0033;border:none;color:#fff;cursor:pointer;flex-shrink:0}
 #tools{font-size:11px;color:#8e8e8e;padding-left:6px}
-#plusMenu{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:92%;max-width:340px;background:#212121;border:1px solid #2a2a2a;border-radius:18px;padding:8px;display:none;flex-direction:column;z-index:60;box-shadow:0 20px 60px rgba(0,0,0,.7)}
-#plusMenu.show{display:flex}
-.pm-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;cursor:pointer}
-.pm-item:hover{background:#2a2a2a}
-.pm-icon{width:32px;height:32px;border-radius:50%;background:#2a2a2a;display:flex;align-items:center;justify-content:center}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:40}
-#overlay.show{display:block}
-@media(min-width:900px){#overlay.show{display:none}}
+#plusMenu{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:92%;max-width:340px;background:#212121;border:1px solid #2a2a2a;border-radius:18px;padding:8px;display:none;flex-direction:column;z-index:60}
+#plusMenu.show{display:flex}.pm-item{display:flex;gap:14px;padding:12px 14px;border-radius:12px;cursor:pointer}.pm-item:hover{background:#2a2a2a}.pm-icon{width:32px;height:32px;border-radius:50%;background:#2a2a2a;display:flex;align-items:center;justify-content:center}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:90}#overlay.show{display:block}@media(min-width:900px){#overlay.show{display:none}}
 </style>
 </head>
 <body>
 <div id="overlay" onclick="closeAll()"></div>
-
-<div id="sidebar">
-<div class="sb-top"><div style="display:flex;align-items:center;gap:10px"><div class="sb-logo"><img src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=S&background=ff0033&color=fff'"></div><b>Scarlet AI</b></div><button class="h-icon" onclick="closeSidebar()">✕</button></div>
-<div class="sb-item active" onclick="newChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New chat</div>
-<div class="sb-item" onclick="toast('Images - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Images</div>
-<div class="sb-item" onclick="toast('Library - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Library</div>
-<div class="sb-item" onclick="toast('Scheduled - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Scheduled</div>
-<div class="sb-item" onclick="toast('More - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> More</div>
-<div class="sb-label">Recents</div>
-<div class="recents" id="recentsList"></div>
-<div class="user-bar" onclick="handleUserClick()"><img id="sideAvatar" src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=G&background=ff0033&color=fff'"><div style="flex:1;overflow:hidden"><b id="userName">Guest</b><span id="userEmail">Tap to login with Gmail</span></div><button style="background:transparent;border:none;color:#fff" onclick="event.stopPropagation();logout()">⎋</button></div>
-</div>
-
-<div id="main">
-<div id="header">
-<div class="left" onclick="openSidebar()"><img src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=S&background=ff0033&color=fff'"> Scarlet AI</div>
-<div class="right">
-<button class="h-icon" onclick="toast('Share coming soon')">↗</button>
-<button class="h-icon" onclick="toast('Settings coming soon')">⚙</button>
-<div class="avatar" id="topAvatar" onclick="handleUserClick()">M</div>
-</div>
-</div>
-
-<div id="center">
-<div id="logo"><img src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=S&background=ff0033&color=fff'"></div>
-<div id="title">Scarlet AI</div>
-<div id="subtitle">How can I help you today?</div>
-<div id="cards">
-<div class="card" onclick="quick('Brainstorm product ideas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A7.5 7.5 0 0 0 2 9.5c0 5.4 7.5 11.5 7.5 11.5S17 14.9 17 9.5A7.5 7.5 0 0 0 9.5 2z"/></svg> Brainstorm product ideas</div>
-<div class="card" onclick="quick('Write and debug code')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg> Write and debug code</div>
-<div class="card" onclick="quick('Generate an image of ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Generate an image</div>
-<div class="card" onclick="quick('Summarize research paper')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Summarize research paper</div>
-</div>
-<div id="chat"></div>
-<div id="bottom"><div id="inputBar"><div id="inputRow"><button id="plusBtn" onclick="togglePlus()">+</button><input id="inp" placeholder="Ask anything" autocomplete="off"><button id="sendBtn" onclick="sendMsg()">↑</button></div><div id="tools">Scarlet AI can make mistakes. Check important info.</div></div></div>
-</div>
-</div>
-
-<div id="plusMenu">
-<div class="pm-item" onclick="triggerCamera()"><div class="pm-icon">📷</div><b>Camera</b></div>
-<div class="pm-item" onclick="triggerPhotos()"><div class="pm-icon">🖼️</div><b>Photos</b></div>
-<div class="pm-item" onclick="triggerFiles()"><div class="pm-icon">📄</div><b>Files</b></div>
-<div class="pm-item" onclick="setCreateImageMode()"><div class="pm-icon">🎨</div><b>Create image</b></div>
-<div class="pm-item" onclick="toggleThinking()"><div class="pm-icon">🧠</div><b id="thinkingLabel">Thinking</b></div>
-</div>
-
-<input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
-<input type="file" id="filePhoto" accept="image/*" hidden>
-<input type="file" id="fileDoc" accept=".pdf,.txt,.doc,.docx,.csv,.json" hidden>
-
+<div id="sidebar"><div class="sb-top"><div style="display:flex;gap:10px;align-items:center"><div class="sb-logo"><img src="logo.png"></div><b>Scarlet AI</b></div><button class="h-btn" onclick="closeSidebar()">✕</button></div>
+<div class="sb-item" onclick="newChat()">+ New chat</div><div class="sb-item" onclick="toast('Images soon')">Images</div><div class="sb-item" onclick="toast('Library soon')">Library</div><div class="sb-item" onclick="toast('Scheduled soon')">Scheduled</div>
+<div style="font-size:11px;color:#8e8e8e;padding:12px 10px 6px">RECENTS</div><div class="recents" id="recentsList"></div>
+<div class="user-bar" onclick="handleUserClick()"><img id="sideAvatar" src="logo.png"><div style="flex:1;overflow:hidden"><b id="userName">Guest</b><span id="userEmail" style="font-size:11px;color:#8e8e8e">Tap to login</span></div></div></div>
+<div id="main"><div id="header"><div style="display:flex;gap:12px;align-items:center"><button class="h-btn" onclick="openSidebar()">☰</button><b>Scarlet AI</b></div><div class="avatar" id="topAvatar" onclick="handleUserClick()">M</div></div>
+<div id="center"><div id="centerLogo"><img src="logo.png"></div><div id="mainTitle">Scarlet AI</div><div id="subTitle">How can I help you today?</div><div id="chat"></div><div id="bottom"><div id="inputBar"><div id="inputRow"><button id="plusBtn" onclick="togglePlus()">+</button><input id="inp" placeholder="Ask anything"><button id="sendBtn" onclick="sendMsg()">↑</button></div><div id="tools">Scarlet AI can make mistakes.</div></div></div></div></div>
+<div id="plusMenu"><div class="pm-item" onclick="triggerCamera()"><div class="pm-icon">📷</div><b>Camera</b></div><div class="pm-item" onclick="triggerPhotos()"><div class="pm-icon">🖼️</div><b>Photos</b></div><div class="pm-item" onclick="triggerFiles()"><div class="pm-icon">📄</div><b>Files</b></div><div class="pm-item" onclick="setCreateImageMode()"><div class="pm-icon">🎨</div><b>Create image</b></div></div>
+<input type="file" id="fileCam" accept="image/*" capture="environment" hidden><input type="file" id="filePhoto" accept="image/*" hidden><input type="file" id="fileDoc" accept=".pdf,.txt,.doc,.docx,.csv,.json" hidden>
 <script>
-let messages=JSON.parse(localStorage.getItem('scarlet_msgs')||'[]');
-let recents=JSON.parse(localStorage.getItem('scarlet_recents')||'[]');
-let user=JSON.parse(localStorage.getItem('scarlet_user')||'null');
-let thinkingMode=false,createImageMode=false;
-const chatEl=document.getElementById('chat');
-const inpEl=document.getElementById('inp');
+let messages=JSON.parse(localStorage.getItem('scarlet_msgs')||'[]'),recents=JSON.parse(localStorage.getItem('scarlet_recents')||'[]'),user=JSON.parse(localStorage.getItem('scarlet_user')||'null'),createImageMode=false;
+const chatEl=document.getElementById('chat'),inpEl=document.getElementById('inp');
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
-function closePlus(){document.getElementById('plusMenu').classList.remove('show')}
-function closeAll(){closeSidebar();closePlus();if(!document.getElementById('sidebar').classList.contains('open'))document.getElementById('overlay').classList.remove('show')}
-function togglePlus(){let m=document.getElementById('plusMenu');let isShow=m.classList.toggle('show');document.getElementById('overlay').classList.toggle('show',isShow||document.getElementById('sidebar').classList.contains('open'))}
-function toast(msg){let d=document.createElement('div');d.className='msg ai';d.textContent=msg;chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('logo').style.display='none';document.getElementById('title').style.display='none';document.getElementById('subtitle').style.display='none';document.getElementById('cards').style.display='none';closeAll()}
-function newChat(){messages=[];localStorage.removeItem('scarlet_msgs');chatEl.innerHTML='';chatEl.style.display='none';document.getElementById('logo').style.display='block';document.getElementById('title').style.display='block';document.getElementById('subtitle').style.display='block';document.getElementById('cards').style.display='grid';closeAll()}
-function addUser(text,imgSrc){let d=document.createElement('div');d.className='msg user';d.textContent=text;if(imgSrc){let im=document.createElement('img');im.src=imgSrc;d.appendChild(im);}chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('logo').style.display='none';document.getElementById('title').style.display='none';document.getElementById('subtitle').style.display='none';document.getElementById('cards').style.display='none';}
-function addAI(text,imgSrc){let d=document.createElement('div');d.className='msg ai';d.textContent=text;if(imgSrc){let im=document.createElement('img');im.src=imgSrc;d.appendChild(im);}chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('logo').style.display='none';document.getElementById('title').style.display='none';document.getElementById('subtitle').style.display='none';document.getElementById('cards').style.display='none';return d;}
-function renderRecents(){let el=document.getElementById('recentsList');el.innerHTML='';recents.slice(0,10).forEach(r=>{let d=document.createElement('div');d.className='recent';d.textContent=r;d.onclick=()=>{inpEl.value=r;closeSidebar();inpEl.focus();};el.appendChild(d);});}
-function handleUserClick(){
- if(user){if(confirm('Logout '+user.name+'?')) logout();return;}
- let name=prompt('Enter your name for Gmail avatar:');
- if(!name) return;
- let email=name.toLowerCase().replace(/\s+/g,'')+'@gmail.com';
- let pic='https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=ff0033&color=fff&size=200';
- user={name,email,picture:pic};
- localStorage.setItem('scarlet_user',JSON.stringify(user));
- showUser();
- toast('Welcome '+name+'! Gmail avatar set.');
-}
-function showUser(){
- if(user){
-  document.getElementById('sideAvatar').src=user.picture;
-  document.getElementById('userName').textContent=user.name;
-  document.getElementById('userEmail').textContent=user.email;
-  document.getElementById('topAvatar').innerHTML='<img src="'+user.picture+'">';
- }else{
-  document.getElementById('sideAvatar').src='logo.png';
-  document.getElementById('userName').textContent='Guest';
-  document.getElementById('userEmail').textContent='Tap to login with Gmail';
-  document.getElementById('topAvatar').textContent='M';
- }
-}
-function logout(){user=null;localStorage.removeItem('scarlet_user');showUser();toast('Logged out successfully');}
-function quick(t){inpEl.value=t+' ';inpEl.focus();}
-function triggerCamera(){closeAll();document.getElementById('fileCam').click()}
-function triggerPhotos(){closeAll();document.getElementById('filePhoto').click()}
-function triggerFiles(){closeAll();document.getElementById('fileDoc').click()}
-function setCreateImageMode(){closeAll();createImageMode=true;inpEl.placeholder='Describe image to create...';inpEl.focus();toast('Create image mode ON - Type what to create');}
-function toggleThinking(){thinkingMode=!thinkingMode;document.getElementById('thinkingLabel').textContent=thinkingMode?'Thinking: ON':'Thinking';closeAll();toast(thinkingMode?'Thinking mode ON':'Thinking mode OFF');}
-function handleFile(file){let reader=new FileReader();reader.onload=e=>{addUser('Uploaded: '+file.name,e.target.result);messages.push({role:'user',content:'[Image: '+file.name+']'});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));};reader.readAsDataURL(file);}
-document.getElementById('fileCam').onchange=e=>{if(e.target.files[0]) handleFile(e.target.files[0])}
-document.getElementById('filePhoto').onchange=e=>{if(e.target.files[0]) handleFile(e.target.files[0])}
-document.getElementById('fileDoc').onchange=e=>{let f=e.target.files[0];if(!f) return;addUser('File: '+f.name);messages.push({role:'user',content:'File: '+f.name});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));}
-async function sendMsg(){
- let q=inpEl.value.trim();if(!q) return;
- addUser(q);inpEl.value='';
- recents.unshift(q);recents=recents.slice(0,20);localStorage.setItem('scarlet_recents',JSON.stringify(recents));renderRecents();
- messages.push({role:'user',content:q});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));
- let th=addAI('Thinking...');document.getElementById('sendBtn').disabled=true;
- try{
-  if(createImageMode){
-   createImageMode=false;inpEl.placeholder='Ask anything';
-   try{let imgEl=await puter.ai.txt2img(q,{model:'black-forest-labs/flux-1-schnell'});th.remove();addAI('Image for: '+q,imgEl.src||imgEl);}catch(e){let url='https://image.pollinations.ai/prompt/'+encodeURIComponent(q)+'?width=1024&height=1024&nologo=1&seed='+Math.floor(Math.random()*999999);th.remove();addAI('Image for: '+q,url);}
-   messages.push({role:'assistant',content:'[Image created]'});
-  }else{
-   let resp=await puter.ai.chat(messages.slice(-10),{model:'gpt-4o-mini'});
-   let reply=resp.message.content||resp.toString();th.remove();addAI(reply);messages.push({role:'assistant',content:reply});
-  }
-  localStorage.setItem('scarlet_msgs',JSON.stringify(messages));
- }catch(err){th.textContent='Error: '+err.message;}
- document.getElementById('sendBtn').disabled=false;
-}
-inpEl.addEventListener('keydown',e=>{if(e.key==='Enter') sendMsg()});
-showUser();renderRecents();
-if(messages.length>0){document.getElementById('logo').style.display='none';document.getElementById('title').style.display='none';document.getElementById('subtitle').style.display='none';document.getElementById('cards').style.display='none';chatEl.style.display='flex';messages.forEach(m=>{if(m.role==='user') addUser(m.content);else addAI(m.content);});}
+function closeAll(){closeSidebar();document.getElementById('plusMenu').classList.remove('show');document.getElementById('overlay').classList.remove('show')}
+function togglePlus(){document.getElementById('plusMenu').classList.toggle('show');document.getElementById('overlay').classList.add('show')}
+function toast(m){let d=document.createElement('div');d.className='msg ai';d.textContent=m;chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('centerLogo').style.display='none';document.getElementById('mainTitle').style.display='none';document.getElementById('subTitle').style.display='none';closeAll()}
+function newChat(){messages=[];localStorage.removeItem('scarlet_msgs');chatEl.innerHTML='';chatEl.style.display='none';document.getElementById('centerLogo').style.display='block';document.getElementById('mainTitle').style.display='block';document.getElementById('subTitle').style.display='block';closeAll()}
+function addUser(t,i){let d=document.createElement('div');d.className='msg user';d.textContent=t;if(i){let im=document.createElement('img');im.src=i;d.appendChild(im);}chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('centerLogo').style.display='none';document.getElementById('mainTitle').style.display='none';document.getElementById('subTitle').style.display='none'}
+function addAI(t,i){let d=document.createElement('div');d.className='msg ai';d.textContent=t;if(i){let im=document.createElement('img');im.src=i;d.appendChild(im);}chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('centerLogo').style.display='none';document.getElementById('mainTitle').style.display='none';document.getElementById('subTitle').style.display='none';return d}
+function renderRecents(){let el=document.getElementById('recentsList');el.innerHTML='';recents.slice(0,10).forEach(r=>{let d=document.createElement('div');d.className='recent';d.textContent=r;d.onclick=()=>{inpEl.value=r;closeAll();};el.appendChild(d);});}
+function handleUserClick(){if(user){if(confirm('Logout '+user.name+'?')){user=null;localStorage.removeItem('scarlet_user');showUser();toast('Logged out');}return;}let n=prompt('Enter your name for Gmail avatar:');if(!n)return;let e=n.toLowerCase().replace(/\s+/g,'')+'@gmail.com';let p='https://ui-avatars.com/api/?name='+encodeURIComponent(n)+'&background=ff0033&color=fff&size=200';user={name:n,email:e,picture:p};localStorage.setItem('scarlet_user',JSON.stringify(user));showUser();toast('Welcome '+n);}
+function showUser(){if(user){document.getElementById('sideAvatar').src=user.picture;document.getElementById('userName').textContent=user.name;document.getElementById('userEmail').textContent=user.email;document.getElementById('topAvatar').innerHTML='<img src="'+user.picture+'">';}else{document.getElementById('sideAvatar').src='logo.png';document.getElementById('userName').textContent='Guest';document.getElementById('userEmail').textContent='Tap to login';document.getElementById('topAvatar').textContent='M';}}
+function triggerCamera(){closeAll();document.getElementById('fileCam').click()}function triggerPhotos(){closeAll();document.getElementById('filePhoto').click()}function triggerFiles(){closeAll();document.getElementById('fileDoc').click()}
+function setCreateImageMode(){closeAll();createImageMode=true;inpEl.placeholder='Describe image to create...';inpEl.focus();toast('Create image mode ON');}
+function handleFile(f){let r=new FileReader();r.onload=e=>{addUser('Uploaded: '+f.name,e.target.result);messages.push({role:'user',content:'[Image: '+f.name+']'});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));};r.readAsDataURL(f);}
+document.getElementById('fileCam').onchange=e=>{if(e.target.files[0])handleFile(e.target.files[0])};document.getElementById('filePhoto').onchange=e=>{if(e.target.files[0])handleFile(e.target.files[0])};document.getElementById('fileDoc').onchange=e=>{let f=e.target.files[0];if(!f)return;addUser('File: '+f.name);messages.push({role:'user',content:'File: '+f.name});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));};
+async function sendMsg(){let q=inpEl.value.trim();if(!q)return;addUser(q);inpEl.value='';recents.unshift(q);recents=recents.slice(0,20);localStorage.setItem('scarlet_recents',JSON.stringify(recents));renderRecents();messages.push({role:'user',content:q});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));let th=addAI('Thinking...');document.getElementById('sendBtn').disabled=true;try{if(createImageMode){createImageMode=false;inpEl.placeholder='Ask anything';try{let imgEl=await puter.ai.txt2img(q,{model:'black-forest-labs/flux-1-schnell'});th.remove();addAI('Image for: '+q,imgEl.src||imgEl);}catch(e){let url='https://image.pollinations.ai/prompt/'+encodeURIComponent(q)+'?width=1024&height=1024&nologo=1&seed='+Math.floor(Math.random()*999999);th.remove();addAI('Image for: '+q,url);}messages.push({role:'assistant',content:'[Image]'});}else{let resp=await puter.ai.chat(messages.slice(-10),{model:'gpt-4o-mini'});let reply=resp.message.content||'';th.remove();addAI(reply);messages.push({role:'assistant',content:reply});}localStorage.setItem('scarlet_msgs',JSON.stringify(messages));}catch(err){th.textContent='Error: '+err.message;}document.getElementById('sendBtn').disabled=false;}
+inpEl.addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg()});showUser();renderRecents();
+if(messages.length>0){document.getElementById('centerLogo').style.display='none';document.getElementById('mainTitle').style.display='none';document.getElementById('subTitle').style.display='none';chatEl.style.display='flex';messages.forEach(m=>{if(m.role==='user')addUser(m.content);else addAI(m.content);});}
 </script>
 </body>
 </html>
