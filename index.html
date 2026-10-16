@@ -5,51 +5,79 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scarlet AI</title>
 <link rel="icon" href="logo.png">
-<!-- This loads the Puter system -->
 <script src="https://puter.com"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#ececec;font-family:Inter,system-ui;height:100vh;height:100dvh;display:flex;flex-direction:column}
-#header{height:64px;background:#121212;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#ececec;font-family:Inter,system-ui;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+#header{height:64px;background:#121212;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:relative;z-index:100}
 #header .left{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:700}
 #header .left img{width:32px;height:32px;border-radius:50%}
 #header .right{display:flex;gap:16px;align-items:center;color:#8e8e8e}
-#wrap{flex:1;display:flex;overflow:hidden}
-#sidebar{width:260px;background:#111;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column;gap:4px}
+
+/* Mobile Menu Toggle Button */
+#menuToggle{display:none;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;padding:4px 8px}
+
+#wrap{flex:1;display:flex;position:relative;overflow:hidden}
+
+#sidebar{width:260px;background:#111;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column;gap:4px;transition:transform 0.3s ease;z-index:90}
 .sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;cursor:pointer;font-size:14px;color:#c7c7c7}
 .sb-item.active{background:#1e1e1e;color:#fff}
 .sb-item:hover{background:#1a1a1a}
 .sb-item svg{width:18px;height:18px}
 #user{margin-top:auto;background:#1a1a1a;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
-#main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px;overflow-y:auto}
+
+#main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px;overflow-y:auto;width:100%}
 #welcomeView{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:760px;margin:auto}
 #logo{width:120px;height:120px;margin-bottom:16px}
-#logo img{width:100%;height:100%;object-fit:contain}
-#title{font-size:42px;font-weight:700;margin-bottom:8px}
-#subtitle{color:#8e8e8e;margin-bottom:28px}
+#logo img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+#title{font-size:42px;font-weight:700;margin-bottom:8px;text-align:center}
+#subtitle{color:#8e8e8e;margin-bottom:28px;text-align:center}
+
 #cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:700px;width:100%;margin-bottom:30px}
 .card{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px}
 .card:hover{background:#252525}
 .card svg{width:20px;height:20px;flex-shrink:0}
+
 #chatContainer{width:100%;max-width:760px;display:none;flex-direction:column;gap:16px;margin-bottom:20px}
 .msg{max-width:85%;padding:14px 16px;border-radius:18px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-break:break-word}
 .msg.user{align-self:flex-end;background:#2a2a2a;color:#fff}
 .msg.ai{align-self:flex-start;background:#121212;border:1px solid #2a2a2a;color:#ececec}
-#inputContainer{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+
+#inputContainer{width:100%;max-width:760px;margin:0 auto mt:auto;width:100%}
 #inputWrap{width:100%;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:28px;padding:10px 12px;display:flex;align-items:center;gap:10px}
-#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px}
-#send{width:38px;height:38px;border-radius:50%;background:#ff0033;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px;width:100%}
+#send{width:38px;height:38px;border-radius:50%;background:#ff0033;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+/* Overlay dark background for mobile menu */
+#sidebarOverlay{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:85}
+
+/* RESPONSIVE MEDIA QUERIES FOR MOBILE */
+@media (max-width: 768px) {
+    #menuToggle{display:block}
+    #sidebar{position:absolute;left:0;top:0;bottom:0;transform:translateX(-100%);box-shadow:5px 0 15px rgba(0,0,0,0.5)}
+    #sidebar.open{transform:translateX(0)}
+    #cards{grid-template-columns:1fr}
+    #title{font-size:32px}
+}
 </style>
 </head>
 <body>
 
 <div id="header">
-    <div class="left"><img src="logo.png" onerror="this.style.display='none'"> Scarlet AI</div>
+    <div class="left">
+        <button id="menuToggle" onclick="toggleSidebar()">☰</button>
+        <img src="logo.png" onerror="this.src='https://placeholder.com'"> 
+        Scarlet AI
+    </div>
     <div class="right"><span>◐</span><span>⚙</span><span style="width:32px;height:32px;background:#333;border-radius:50%;display:inline-block"></span></div>
 </div>
 
 <div id="wrap">
+    <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
     <div id="sidebar">
-        <div class="sb-item active" onclick="resetChat()"><svg viewBox="0 0 24 24" fill="none" stroke="#ff0033" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New chat</div>
+        <div class="sb-item active" onclick="resetChat(); closeSidebar();"><svg viewBox="0 0 24 24" fill="none" stroke="#ff0033" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New chat</div>
         <div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Images</div>
         <div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Library</div>
         <div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Scheduled</div>
@@ -57,12 +85,12 @@
         <div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Projects</div>
         <div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg> Codex</div>
         <div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> More</div>
-        <div id="user"><img src="logo.png" style="width:32px;height:32px;border-radius:50%" onerror="this.style.display='none'"> <div><b style="font-size:13px">You</b></div></div>
+        <div id="user"><img src="logo.png" style="width:32px;height:32px;border-radius:50%" onerror="this.src='https://placeholder.com'"> <div><b style="font-size:13px">You</b></div></div>
     </div>
 
     <div id="main">
         <div id="welcomeView">
-            <div id="logo"><img src="logo.png" onerror="this.style.display='none'"></div>
+            <div id="logo"><img src="logo.png" onerror="this.src='https://placeholder.com'"></div>
             <div id="title">Scarlet AI</div>
             <div id="subtitle">How can I help you today?</div>
             <div id="cards">
@@ -88,9 +116,17 @@
 <script>
 let messages = [];
 
-// Automatic login trigger so Puter knows who you are right away!
-if(window.puter) {
-    puter.ui.getAuthToken().catch(err => console.log("Login window ready"));
+// Handle Mobile Menu UI drawer animations
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    sidebar.classList.toggle('open');
+    overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').style.display = 'none';
 }
 
 function quick(text) {
@@ -136,47 +172,3 @@ function scrollToBottom() {
 async function sendMsg() {
     let inputField = document.getElementById('inp');
     let promptQuery = inputField.value.trim();
-    if (!promptQuery) return;
-
-    addUserMessage(promptQuery);
-    inputField.value = '';
-    messages.push({ role: 'user', content: promptQuery });
-
-    let aiBubble = createAiMessagePlaceholder();
-    let structuredResponse = "";
-
-    try {
-        // Corrected Puter AI call setup
-        const response = await puter.ai.chat(messages, { 
-            model: 'gpt-4o-mini', 
-            stream: false 
-        });
-
-        // Pull the text and show it clearly
-        if (response && response.message && response.message.content) {
-            structuredResponse = response.message.content;
-        } else {
-            structuredResponse = "No response text found.";
-        }
-
-        aiBubble.textContent = structuredResponse;
-        scrollToBottom();
-
-        messages.push({ role: 'assistant', content: structuredResponse });
-
-    } catch (error) {
-        console.error("Puter Error:", error);
-        aiBubble.textContent = 'Click to Sign In / Try Again';
-        aiBubble.style.cursor = 'pointer';
-        aiBubble.style.borderColor = '#ff0033';
-        
-        // If it fails, clicking the message box opens the Puter login window for you
-        aiBubble.onclick = function() {
-            puter.ui.getAuthToken().then(() => {
-                aiBubble.textContent = "Signed in! Please type your message again.";
-                aiBubble.onclick = null;
-            });
-        };
-    }
-}
-
