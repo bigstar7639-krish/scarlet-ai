@@ -1,78 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Scarlet AI</title>
 <link rel="icon" href="logo.png">
 <script src="https://js.puter.com/v2/"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#ececec;font-family:Inter,system-ui;height:100vh;height:100dvh;display:flex;flex-direction:column}
-#header{height:64px;background:#121212;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-#header .left{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:700}
-#header .left img{width:32px;height:32px;border-radius:50%}
-#header .right{display:flex;gap:16px;align-items:center;color:#8e8e8e}
-#wrap{flex:1;display:flex;overflow:hidden}
-#sidebar{width:260px;background:#111;border-right:1px solid #222;padding:16px;display:flex;flex-direction:column;gap:4px}
-.sb-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;cursor:pointer;font-size:14px;color:#c7c7c7}
-.sb-item.active{background:#1e1e1e;color:#fff}
-.sb-item:hover{background:#1a1a1a}
-.sb-item svg{width:18px;height:18px}
-#user{margin-top:auto;background:#1a1a1a;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
-#main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
-#logo{width:120px;height:120px;margin-bottom:16px}
-#logo img{width:100%;height:100%;object-fit:contain}
-#title{font-size:42px;font-weight:700;margin-bottom:8px}
-#subtitle{color:#8e8e8e;margin-bottom:28px}
-#cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:700px;width:100%;margin-bottom:30px}
-.card{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px}
-.card:hover{background:#252525}
-.card svg{width:20px;height:20px;flex-shrink:0}
-#inputWrap{width:100%;max-width:760px;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:28px;padding:10px 12px;display:flex;align-items:center;gap:10px}
-#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px}
-#send{width:38px;height:38px;border-radius:50%;background:#ff0033;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#chat{width:100%;max-width:760px;display:none;flex-direction:column;gap:16px;margin-bottom:20px}
-.msg{max-width:85%;padding:14px 16px;border-radius:18px;line-height:1.6;font-size:14px;white-space:pre-wrap}
-.msg.user{align-self:flex-end;background:#2a2a2a}.msg.ai{align-self:flex-start;background:#121212;border:1px solid #2a2a2a}
+:root{--bg:#000;--panel:#121212;--input:#1e1e1e;--border:#2a2a2a;--text:#ececec;--muted:#8e8e8e;--scarlet:#ff0033}
+*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--text);font-family:Inter,system-ui;height:100vh;height:100dvh;display:flex;overflow:hidden}
+button{font-family:inherit}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;background:var(--panel);transform:translateX(-100%);transition:transform.28s ease;z-index:50;display:flex;flex-direction:column;padding:12px;border-right:1px solid var(--border)}
+#sidebar.open{transform:translateX(0)}
+@media(min-width:900px){#sidebar{transform:translateX(0);position:relative}#sidebar.open{transform:translateX(0)}#overlay{display:none!important}}
+.sb-top{display:flex;align-items:center;justify-content:space-between;padding:8px}
+.sb-logo{width:32px;height:32px;border-radius:50%;overflow:hidden;background:#000;border:1px solid var(--scarlet);display:flex;align-items:center;justify-content:center}
+.sb-logo img{width:100%;height:100%;object-fit:cover}
+.sb-item{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:10px;cursor:pointer;font-size:14px}
+.sb-item:hover{background:#1e1e1e}
+.sb-item svg{width:18px;height:18px;stroke:#fff;flex-shrink:0}
+.sb-label{font-size:11px;color:var(--muted);text-transform:uppercase;padding:8px 10px;margin-top:14px}
+.recents{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.recent{padding:9px 10px;border-radius:8px;font-size:13px;color:#c7c7c7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.recent:hover{background:#1e1e1e}
+.user-bar{margin-top:auto;background:#1a1a1a;border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.user-bar img{width:32px;height:32px;border-radius:50%}
+.user-bar b{font-size:13px;display:block}.user-bar span{font-size:11px;color:var(--muted)}
+#main{flex:1;display:flex;flex-direction:column;min-width:0;margin-left:0}
+@media(min-width:900px){#main{margin-left:0}}
+#header{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.h-left{display:flex;align-items:center;gap:12px}
+.h-btn{width:36px;height:36px;border-radius:10px;background:transparent;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.h-btn:hover{background:#1e1e1e}
+.h-title{display:flex;align-items:center;gap:6px;font-weight:600;font-size:16px;cursor:pointer}
+.avatar{width:32px;height:32px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;overflow:hidden;cursor:pointer}
+.avatar img{width:100%;height:100%;object-fit:cover}
+#center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:20px;min-height:0}
+#centerLogo{width:150px;height:150px;margin-bottom:20px;border-radius:50%;overflow:hidden;box-shadow:0 0 40px rgba(255,0,51,.4);border:2px solid var(--scarlet);flex-shrink:0}
+#centerLogo img{width:100%;height:100%;object-fit:cover}
+#chat{width:100%;max-width:760px;display:flex;flex-direction:column;gap:16px;display:none}
+.msg{max-width:85%;padding:14px 16px;border-radius:18px;line-height:1.6;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.msg.user{align-self:flex-end;background:#2a2a2a}.msg.ai{align-self:flex-start;background:var(--panel);border:1px solid var(--border)}
+.msg img{max-width:100%;border-radius:12px;margin-top:8px}
+#bottomWrap{padding:12px 16px 18px;display:flex;justify-content:center;flex-shrink:0;background:var(--bg)}
+#inputBar{width:100%;max-width:760px;background:var(--input);border:1px solid var(--border);border-radius:28px;padding:10px 10px 10px 12px;display:flex;flex-direction:column;gap:8px}
+#inputRow{display:flex;align-items:center;gap:8px}
+#plusBtn{width:36px;height:36px;border-radius:50%;background:#2a2a2a;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+#inp{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:15px;padding:8px;min-width:0}
+#sendBtn{width:36px;height:36px;border-radius:50%;border:none;background:var(--scarlet);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+#sendBtn:disabled{opacity:.4}
+#tools{font-size:11px;color:var(--muted);padding-left:6px}
+#plusMenu{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);width:92%;max-width:340px;background:#212121;border:1px solid var(--border);border-radius:18px;padding:8px;display:none;flex-direction:column;z-index:60;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#plusMenu.show{display:flex;transform:translateX(-50%) translateY(0)}
+.pm-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;cursor:pointer}
+.pm-item:hover{background:#2a2a2a}
+.pm-icon{width:32px;height:32px;border-radius:50%;background:#2a2a2a;display:flex;align-items:center;justify-content:center}
+.pm-icon svg{width:18px;height:18px}
+.pm-item b{font-size:14px;font-weight:500}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:40}
+#overlay.show{display:block}
+@media(min-width:900px){#overlay.show{display:none}}
 </style>
 </head>
 <body>
-<div id="header">
-<div class="left"><img src="logo.png"> Scarlet AI</div>
-<div class="right"><span>◐</span><span>⚙</span><span style="width:32px;height:32px;background:#333;border-radius:50%;display:inline-block"></span></div>
-</div>
-<div id="wrap">
+<div id="overlay" onclick="closeSidebar();closePlus();"></div>
+
 <div id="sidebar">
-<div class="sb-item active"><svg viewBox="0 0 24 24" fill="none" stroke="#ff0033" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New chat</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Images</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Library</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Scheduled</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> Plugins</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Projects</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg> Codex</div>
-<div class="sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> More</div>
-<div id="user"><img src="logo.png" style="width:32px;height:32px;border-radius:50%"> <div><b style="font-size:13px">You</b></div></div>
+<div class="sb-top"><div style="display:flex;align-items:center;gap:10px"><div class="sb-logo"><img src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=S&background=ff0033&color=fff'"></div><b>Scarlet AI</b></div><button class="h-btn" onclick="closeSidebar()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 L6 18 M6 6 L18 18"/></svg></button></div>
+<div class="sb-item" onclick="newChat();closeSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New chat</div>
+<div class="sb-item" onclick="toast('Images - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Images</div>
+<div class="sb-item" onclick="toast('Library - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Library</div>
+<div class="sb-item" onclick="toast('Scheduled - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Scheduled</div>
+<div class="sb-item" onclick="toast('Plugins - Coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg> More</div>
+<div class="sb-label">Recents</div>
+<div class="recents" id="recentsList"></div>
+<div class="user-bar" id="userBar" onclick="handleUserClick()">
+<img id="sideAvatar" src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=You&background=ff0033&color=fff'">
+<div style="flex:1;overflow:hidden"><b id="userName">Guest</b><span id="userEmail">Free plan - Click to login</span></div>
+<button style="background:transparent;border:none;color:#fff;cursor:pointer" onclick="event.stopPropagation();logout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
 </div>
+</div>
+
 <div id="main">
-<div id="logo"><img src="logo.png"></div>
-<div id="title">Scarlet AI</div>
-<div id="subtitle">How can I help you today?</div>
-<div id="cards">
-<div class="card" onclick="quick('Brainstorm product ideas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A7.5 7.5 0 0 0 2 9.5c0 5.4 7.5 11.5S17 14.9 17 9.5A7.5 7.5 0 0 0 9.5 2z"/></svg> Brainstorm product ideas</div>
-<div class="card" onclick="quick('Write and debug code')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg> Write and debug code</div>
-<div class="card" onclick="quick('Generate an image of')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Generate an image</div>
-<div class="card" onclick="quick('Summarize research paper')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Summarize research paper</div>
+<div id="header">
+<div class="h-left"><button class="h-btn" onclick="openSidebar()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="15" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="15" y2="18"/></svg></button><div class="h-title" onclick="newChat()">Scarlet AI</div></div>
+<div class="h-right"><div class="avatar" id="topAvatar" onclick="handleUserClick()"><img src="logo.png" onerror="this.parentElement.textContent='M'"></div></div>
 </div>
+<div id="center">
+<div id="centerLogo"><img src="logo.png" onerror="this.src='https://ui-avatars.com/api/?name=S&background=ff0033&color=fff'"></div>
+<h2 style="font-size:28px;margin-bottom:6px">Scarlet AI</h2>
+<p style="color:#8e8e8e;margin-bottom:24px">How can I help you today?</p>
 <div id="chat"></div>
-<div id="inputWrap"><button style="width:36px;height:36px;border-radius:50%;background:#2a2a2a;border:none;color:#fff">+</button><input id="inp" placeholder="Ask anything"><button id="send" onclick="sendMsg()">↑</button></div>
 </div>
+<div id="bottomWrap"><div id="inputBar"><div id="inputRow"><button id="plusBtn" onclick="togglePlus()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button><input id="inp" placeholder="Ask anything" autocomplete="off"><button id="sendBtn" onclick="sendMsg()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div><div id="tools">Scarlet AI can make mistakes. Check important info.</div></div></div>
 </div>
+
+<div id="plusMenu">
+<div class="pm-item" onclick="triggerCamera()"><div class="pm-icon">📷</div><b>Camera</b></div>
+<div class="pm-item" onclick="triggerPhotos()"><div class="pm-icon">🖼️</div><b>Photos</b></div>
+<div class="pm-item" onclick="triggerFiles()"><div class="pm-icon">📄</div><b>Files</b></div>
+<div class="pm-item" onclick="setCreateImageMode()"><div class="pm-icon">🎨</div><b>Create image</b></div>
+<div class="pm-item" onclick="toggleThinking()"><div class="pm-icon">💭</div><b id="thinkingLabel">Thinking</b></div>
+</div>
+
+<input type="file" id="fileCam" accept="image/*" capture="environment" hidden>
+<input type="file" id="filePhoto" accept="image/*" hidden>
+<input type="file" id="fileDoc" accept=".pdf,.txt,.doc,.docx,.csv,.json" hidden>
+
 <script>
-let messages=[];
-function quick(t){document.getElementById('inp').value=t+' ';document.getElementById('inp').focus()}
-function addUser(t){let d=document.createElement('div');d.className='msg user';d.textContent=t;document.getElementById('chat').appendChild(d);document.getElementById('chat').style.display='flex';document.getElementById('logo').style.display='none';document.getElementById('title').style.display='none';document.getElementById('subtitle').style.display='none';document.getElementById('cards').style.display='none'}
-function addAI(t){let d=document.createElement('div');d.className='msg ai';d.textContent=t;document.getElementById('chat').appendChild(d);return d}
-async function sendMsg(){let q=document.getElementById('inp').value.trim();if(!q)return;addUser(q);document.getElementById('inp').value='';messages.push({role:'user',content:q});let th=addAI('Thinking...');try{let r=await puter.ai.chat(messages,{model:'gpt-4o-mini'});th.remove();addAI(r.message.content);messages.push({role:'assistant',content:r.message.content})}catch(e){th.textContent='Error: '+e.message}}
-document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg()})
+let messages=JSON.parse(localStorage.getItem('scarlet_msgs')||'[]');
+let recents=JSON.parse(localStorage.getItem('scarlet_recents')||'[]');
+let user=JSON.parse(localStorage.getItem('scarlet_user')||'null');
+let thinkingMode=false,createImageMode=false;
+const chatEl=document.getElementById('chat'),centerLogo=document.getElementById('centerLogo'),inp=document.getElementById('inp');
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function togglePlus(){document.getElementById('plusMenu').classList.toggle('show');document.getElementById('overlay').classList.toggle('show')}
+function closePlus(){document.getElementById('plusMenu').classList.remove('show');document.getElementById('overlay').classList.remove('show')}
+function toast(m){closePlus();addAI(m);}
+function newChat(){messages=[];localStorage.removeItem('scarlet_msgs');chatEl.innerHTML='';chatEl.style.display='none';document.getElementById('centerLogo').style.display='block';document.querySelector('#center h2').style.display='block';document.querySelector('#center p').style.display='block';closeSidebar()}
+function addUser(t,img){let d=document.createElement('div');d.className='msg user';d.textContent=t;if(img){let im=document.createElement('img');im.src=img;d.appendChild(im);}chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('centerLogo').style.display='none';document.querySelector('#center h2').style.display='none';document.querySelector('#center p').style.display='none';chatEl.scrollTop=chatEl.scrollHeight}
+function addAI(t,img){let d=document.createElement('div');d.className='msg ai';d.textContent=t;if(img){let im=document.createElement('img');im.src=img;d.appendChild(im);}chatEl.appendChild(d);chatEl.style.display='flex';document.getElementById('centerLogo').style.display='none';document.querySelector('#center h2').style.display='none';document.querySelector('#center p').style.display='none';chatEl.scrollTop=chatEl.scrollHeight;return d}
+function renderRecents(){let el=document.getElementById('recentsList');el.innerHTML='';recents.slice(0,12).forEach(r=>{let d=document.createElement('div');d.className='recent';d.textContent=r;d.onclick=()=>{inp.value=r;closeSidebar();};el.appendChild(d);});}
+function handleUserClick(){
+ if(user){if(confirm('Logout '+user.name+'?')) logout();return;}
+ let name=prompt('Enter your name (for Gmail avatar):');
+ if(!name) return;
+ let email=name.toLowerCase().replace(/\s+/g,'')+'@gmail.com';
+ let pic='https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=ff0033&color=fff&size=128';
+ user={name,email,picture:pic};
+ localStorage.setItem('scarlet_user',JSON.stringify(user));
+ showUser();
+ addAI('Welcome '+name+'! Your Gmail avatar is set.');
+}
+function showUser(){
+ if(user){
+  document.getElementById('sideAvatar').src=user.picture;
+  document.getElementById('userName').textContent=user.name;
+  document.getElementById('userEmail').textContent=user.email;
+  document.getElementById('topAvatar').innerHTML='<img src="'+user.picture+'">';
+ }else{
+  document.getElementById('sideAvatar').src='logo.png';
+  document.getElementById('userName').textContent='Guest';
+  document.getElementById('userEmail').textContent='Free plan - Click to login';
+  document.getElementById('topAvatar').innerHTML='<img src="logo.png" onerror="this.parentElement.textContent=\'M\'">';
+ }
+}
+function logout(){user=null;localStorage.removeItem('scarlet_user');showUser();toast('Logged out');}
+function triggerCamera(){closePlus();document.getElementById('fileCam').click()}
+function triggerPhotos(){closePlus();document.getElementById('filePhoto').click()}
+function triggerFiles(){closePlus();document.getElementById('fileDoc').click()}
+function setCreateImageMode(){closePlus();createImageMode=true;inp.placeholder='Describe image to create...';inp.focus();addAI('Create image mode ON: Type what you want to create.');}
+function toggleThinking(){thinkingMode=!thinkingMode;document.getElementById('thinkingLabel').textContent=thinkingMode?'Thinking: ON':'Thinking';closePlus();addAI(thinkingMode?'Thinking mode enabled. I will think step by step.':'Thinking mode disabled.');}
+async function handleFile(file){let reader=new FileReader();reader.onload=e=>{addUser('Uploaded: '+file.name,e.target.result);messages.push({role:'user',content:'[Image uploaded: '+file.name+'] Analyze this image.'});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));};reader.readAsDataURL(file);}
+document.getElementById('fileCam').onchange=e=>{if(e.target.files[0]) handleFile(e.target.files[0])}
+document.getElementById('filePhoto').onchange=e=>{if(e.target.files[0]) handleFile(e.target.files[0])}
+document.getElementById('fileDoc').onchange=e=>{let f=e.target.files[0];if(!f) return;addUser('File: '+f.name);messages.push({role:'user',content:'File uploaded: '+f.name});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));}
+async function sendMsg(){let q=inp.value.trim();if(!q) return;addUser(q);inp.value='';recents.unshift(q);recents=recents.slice(0,20);localStorage.setItem('scarlet_recents',JSON.stringify(recents));renderRecents();messages.push({role:'user',content:q});localStorage.setItem('scarlet_msgs',JSON.stringify(messages));let th=addAI('Thinking...');document.getElementById('sendBtn').disabled=true;try{if(createImageMode){createImageMode=false;inp.placeholder='Ask anything';try{let imgEl=await puter.ai.txt2img(q,{model:'black-forest-labs/flux-1-schnell'});th.remove();addAI('Image created for: '+q,imgEl.src||imgEl);}catch(e){let url='https://image.pollinations.ai/prompt/'+encodeURIComponent(q)+'?nologo=1&width=1024&height=1024&seed='+Math.floor(Math.random()*1000000);th.remove();addAI('Image created for: '+q,url);}messages.push({role:'assistant',content:'[Image created: '+q+']'});}else{let prompt=thinkingMode?'Think step by step and then answer: '+q:q;let resp=await puter.ai.chat([...messages.slice(-10)],{model:'gpt-4o-mini'});let reply=resp.message.content;th.remove();addAI(reply);messages.push({role:'assistant',content:reply);}localStorage.setItem('scarlet_msgs',JSON.stringify(messages));}catch(e){th.textContent='Error: '+e.message+' - Try again.';}document.getElementById('sendBtn').disabled=false;}
+inp.addEventListener('keydown',e=>{if(e.key==='Enter') sendMsg()});
+showUser();renderRecents();
+if(messages.length>0){document.getElementById('centerLogo').style.display='none';document.querySelector('#center h2').style.display='none';document.querySelector('#center p').style.display='none';chatEl.style.display='flex';messages.forEach(m=>{if(m.role==='user') addUser(m.content);else addAI(m.content);});}
+if(window.innerWidth<900){closeSidebar()}
 </script>
 </body>
 </html>
